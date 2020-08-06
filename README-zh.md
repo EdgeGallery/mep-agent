@@ -62,7 +62,7 @@ Mep-Agent由Go语言开发，并以docker映像的形式提供服务。当启动
                mep-agent:latest
     ```
 
-有关构建和安装过程的更多详细信息，请参阅 [HERE](https://gitee.com/edgegallery/docs/blob/master/MEP/EdgeGallery%E6%9C%AC%E5%9C%B0%E5%BC%80%E5%8F%91%E9%AA%8C%E8%AF%81%E6%9C%8D%E5%8A%A1%E8%AF%B4%E6%98%8E%E4%B9%A6.md).
+有关mepagent.properties以及构建和安装过程的更多详细信息，请参阅 [HERE](https://gitee.com/edgegallery/docs/blob/master/MEP/EdgeGallery%E6%9C%AC%E5%9C%B0%E5%BC%80%E5%8F%91%E9%AA%8C%E8%AF%81%E6%9C%8D%E5%8A%A1%E8%AF%B4%E6%98%8E%E4%B9%A6.md).
   
 ## 注意
 
