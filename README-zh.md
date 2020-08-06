@@ -40,12 +40,12 @@ Mep-Agent由Go语言开发，并以docker映像的形式提供服务。当启动
 
 - ### 构建
 
-    git clone from mep-agent master repo
+    git clone mep-agent代码
     ```
     git clone https://gitee.com/edgegallery/mep-agent.git
     ```
   
-    build the mep-agent image
+    构建mep-agent镜像
     ```
     docker build -t mep-agent:latest -f docker/Dockerfile .
     ```
