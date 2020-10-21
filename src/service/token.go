@@ -26,10 +26,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Returns token
+// Request token from mep_auth
 func GetMepToken(auth model.Auth) (*model.TokenModel, error) {
 
 	log.Info("begin to get token from mep_auth")
+
+	// get request url
 	server, errGetServer := config.GetServerUrl()
 	if errGetServer != nil {
 		// clear sk
@@ -38,16 +40,18 @@ func GetMepToken(auth model.Auth) (*model.TokenModel, error) {
 		return nil, errGetServer
 	}
 
-	url := server.MepAuthUrl
-	resp, errPostRequest := PostTokenRequest("", url, auth)
+	// construct http request and send
+	resp, errPostRequest := PostTokenRequest("", server.MepAuthUrl, auth)
 	if errPostRequest != nil {
 		return nil, errPostRequest
 	}
 
+	// unmarshal resp to object
 	var token model.TokenModel
 	errJson := json.Unmarshal([]byte(resp), &token)
-	respMsg := *(*[]byte)(unsafe.Pointer(&resp))
-	util.ClearByteArray(respMsg)
+
+	// clear resp
+	util.ClearByteArray(*(*[]byte)(unsafe.Pointer(&resp)))
 	if errJson != nil {
 		return nil, errJson
 	}

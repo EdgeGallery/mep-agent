@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-// util package
+// Clear util
 package util
 
 // Clears byte array
@@ -24,5 +24,12 @@ func ClearByteArray(data []byte) {
 	}
 	for i := 0; i < len(data); i++ {
 		data[i] = 0
+	}
+}
+
+// clear [string, *[]byte] map
+func ClearMap(maps map[string]*[]byte){
+	for _, element := range maps {
+		ClearByteArray(*element)
 	}
 }

@@ -40,7 +40,7 @@ var cipherSuiteMap = map[string]uint16{
 	"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384": tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 }
 
-// get yaml and parse to struct
+// get yaml and parse to AppInstanceInfo object
 func GetAppInstanceConf(path string) (model.AppInstanceInfo, error) {
 	log.Info("begin to parse the app_instance_info.yaml")
 	yamlFile, err := ioutil.ReadFile(path)
@@ -71,12 +71,14 @@ func getAPPConf(path string) (model.AppConfInfo, error) {
 
 // register to mep
 func PostRegisterRequest(registerData RegisterData) (string, error) {
+	// construct http request
 	req, errNewRequest := http.NewRequest("POST", registerData.url, strings.NewReader(registerData.data))
 	if errNewRequest != nil {
 		return "", errNewRequest
 	}
 	req.Header.Set("Authorization", registerData.token.TokenType+" "+registerData.token.AccessToken)
 
+	// send http request
 	response, errDo := DoRequest(req)
 	if errDo != nil {
 		return "", errDo
@@ -99,6 +101,7 @@ func PostRegisterRequest(registerData RegisterData) (string, error) {
 // get token from mep
 func PostTokenRequest(param string, url string, auth model.Auth) (string, error) {
 
+	// construct http request
 	req, errNewRequest := http.NewRequest("POST", url, strings.NewReader(param))
 	if errNewRequest != nil {
 		// clear sk
@@ -106,11 +109,11 @@ func PostTokenRequest(param string, url string, auth model.Auth) (string, error)
 		util.ClearByteArray(*sk)
 		return "", errNewRequest
 	}
-
+	// request header
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set(util.DATE_HEADER, time.Now().Format(util.DATE_FORMAT))
 	req.Header.Set("Host", req.Host)
-
+	// calculate signature by safe algorithm
 	sign := util.Sign{
 		AccessKey: auth.AccessKey,
 		SecretKey: auth.SecretKey,
@@ -121,6 +124,7 @@ func PostTokenRequest(param string, url string, auth model.Auth) (string, error)
 	}
 	req.Header.Set("Authorization", authorization)
 
+	// send http request
 	response, errDo := DoRequest(req)
 	if errDo != nil {
 		return "", errDo

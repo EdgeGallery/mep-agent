@@ -33,8 +33,10 @@ func BeginService() *Ser {
 	return &Ser{}
 }
 
-// start service
+// service entrance
 func (ser *Ser) Start(confPath string, ak string, sk *[]byte, wg *sync.WaitGroup) *model.TokenModel {
+
+	// read app_instance_info.yaml file and transform to AppInstanceInfo object
 	conf, errGetConf := GetAppInstanceConf(confPath)
 	if errGetConf != nil {
 		// clear sk
@@ -43,12 +45,15 @@ func (ser *Ser) Start(confPath string, ak string, sk *[]byte, wg *sync.WaitGroup
 		return nil
 	}
 
+	// signed ak and sk, then request the token
 	var auth = model.Auth{AccessKey: ak, SecretKey: sk}
 	token, errGetMepToken := GetMepToken(auth)
 	if errGetMepToken != nil {
 		log.Error("get token failed.")
 		return nil
 	}
+
+	// register service to mep with token
 	errRegisterToMep := RegisterToMep(conf, token, wg)
 	if errRegisterToMep != nil {
 		log.Error("failed to register to mep: " + errRegisterToMep.Error())

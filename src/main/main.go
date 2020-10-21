@@ -33,54 +33,23 @@ import (
 
 type AppConfigProperties map[string]*[]byte
 
-func getMepAgentAppConfig(line []byte, config AppConfigProperties) AppConfigProperties {
-	if bytes.Contains(line, []byte("=")) {
-		keyVal := bytes.Split(line, []byte("="))
-		key := bytes.TrimSpace(keyVal[0])
-		val := bytes.TrimSpace(keyVal[1])
-		config[string(key)] = &val
-	}
-	return config
-}
-
-func readPropertiesFile(filename string) (AppConfigProperties, error) {
-	config := AppConfigProperties{}
-
-	if len(filename) == 0 {
-		return config, nil
-	}
-	file, err := os.Open(filename)
-	if err != nil {
-		log.Error("Failed to open the file.")
-		return nil, err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Bytes()
-		config = getMepAgentAppConfig(line, config)
-	}
-	if err := scanner.Err(); err != nil {
-		log.Error("Failed to read the file.")
-		clearAppConfigOnExit(config)
-		return nil, err
-	}
-	return config, nil
-}
 func main() {
+
+	// read mepagent.properties file to AppConfigProperties object
 	configFilePath := filepath.FromSlash("/usr/mep/mepagent.properties")
 	appConfig, err := readPropertiesFile(configFilePath)
 	if err != nil {
 		log.Error("Failed to read the config parameters from properties file")
 		os.Exit(1)
 	}
+
+	// clear mepagent.properties file
 	err = os.Truncate(configFilePath, 0)
 	if err != nil {
-		clearAppConfigOnExit(appConfig)
+		util.ClearMap(appConfig)
 		os.Exit(1)
 	}
-	var waitRoutineFinish sync.WaitGroup
+
 	enableWait := false
 
 	// wait before exit if only enabled by environment variable
@@ -90,40 +59,80 @@ func main() {
 		}
 	}
 
+	// validate ACCESS_KEY and SECRET_KEY with nil, length and regex
 	if appConfig["ACCESS_KEY"] == nil || len(*appConfig["ACCESS_KEY"]) == 0 {
 		log.Info("The input param of ak is invalid")
-		clearAppConfigOnExit(appConfig)
+		util.ClearMap(appConfig)
 		os.Exit(1)
 	}
-
 	if appConfig["SECRET_KEY"] == nil || len(*appConfig["SECRET_KEY"]) == 0 {
 		log.Info("The input param of sk is invalid")
-		clearAppConfigOnExit(appConfig)
+		util.ClearMap(appConfig)
+		os.Exit(1)
+	}
+	if err := util.ValidateAkSk(string(*appConfig["ACCESS_KEY"]), appConfig["SECRET_KEY"]); err != nil {
+		log.Info("the input param of ak or sk do not pass the validation")
+		util.ClearMap(appConfig)
 		os.Exit(1)
 	}
 
-	if err := util.ValidateAkSk(string(*appConfig["ACCESS_KEY"]), appConfig["SECRET_KEY"]); err != nil {
-		log.Info("the input param of ak or sk do not pass the validation")
-		clearAppConfigOnExit(appConfig)
-		os.Exit(1)
-	}
 	sk := appConfig["SECRET_KEY"]
+	var waitRoutineFinish sync.WaitGroup
+
+	// start main service
 	token := service.BeginService().Start("./conf/app_instance_info.yaml",
 		string(*appConfig["ACCESS_KEY"]), sk, &waitRoutineFinish)
 	waitRoutineFinish.Wait()
 	if token != nil {
-		// clear skValue
-		skByteVal := *(*[]byte)(unsafe.Pointer(&token.AccessToken))
-		util.ClearByteArray(skByteVal)
+		// clear access_token
+		accessToken := *(*[]byte)(unsafe.Pointer(&token.AccessToken))
+		util.ClearByteArray(accessToken)
 		*token = model.TokenModel{}
 	}
+
+	// service heart
 	if enableWait {
 		service.Heart()
 	}
 }
 
-func clearAppConfigOnExit(appConfig AppConfigProperties){
-	for _, element := range appConfig {
-		util.ClearByteArray(*element)
+// read mepagent.properties file to AppConfigProperties object
+func readPropertiesFile(filePath string) (AppConfigProperties, error) {
+	var config AppConfigProperties
+
+	// validate path length and open the file
+	if len(filePath) == 0 {
+		return config, nil
 	}
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Error("Failed to open the file.")
+		return nil, err
+	}
+	defer file.Close()
+
+	// scanner the file and transform to AppConfigProperties object
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		config = transformLineToAppConfigProperties(line, config)
+	}
+	if err := scanner.Err(); err != nil {
+		log.Error("Failed to read the file.")
+		util.ClearMap(config)
+		return nil, err
+	}
+	return config, nil
 }
+
+func transformLineToAppConfigProperties(line []byte, config AppConfigProperties) AppConfigProperties {
+	if bytes.Contains(line, []byte("=")) {
+		keyVal := bytes.Split(line, []byte("="))
+		key := bytes.TrimSpace(keyVal[0])
+		val := bytes.TrimSpace(keyVal[1])
+		config[string(key)] = &val
+	}
+	return config
+}
+
+
