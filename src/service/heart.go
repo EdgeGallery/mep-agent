@@ -17,9 +17,47 @@
 // heart service
 package service
 
-import "time"
+import (
+	"encoding/json"
+	log "github.com/sirupsen/logrus"
+	"mep-agent/src/config"
+	"mep-agent/src/model"
+	"time"
+)
+
+type HeartBeatData struct {
+	token *model.TokenModel
+	data  string
+	url   string
+}
+
+type ServiceLivenessUpdate struct {
+	State string `json:"state"`
+}
 
 // Sleeps for an hour
 func Heart() {
 	time.Sleep(time.Hour)
+}
+
+// Send service heartbeat to MEP
+func HeartBeatRequestToMep(serviceInfo model.ServiceInfoPost, token *model.TokenModel) {
+
+	heartBeatRequest := ServiceLivenessUpdate{State: "ACTIVE"}
+	data, errJsonMarshal := json.Marshal(heartBeatRequest)
+	if errJsonMarshal != nil {
+		log.Error("Failed to marshal service info to object")
+	}
+
+	server, errGetServer := config.GetServerUrl()
+	if errGetServer != nil {
+		log.Error("Failed to get serviceUrl")
+	}
+
+	url := server.MepHeartBeatUrl + serviceInfo.Links.Self.Liveness
+	var heartBeatData = HeartBeatData{data: string(data), url: url, token: token}
+	_, errPostRequest := SendHeartBeatRequest(heartBeatData)
+	if errPostRequest != nil {
+		log.Error("Failed heart beat request to mep, URL is " + url)
+	}
 }

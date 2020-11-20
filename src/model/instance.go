@@ -34,6 +34,15 @@ type ServiceInfoPost struct {
 	ScopeOfLocality   LocalityType   `yaml:"scopeOfLocality" json:"scopeOfLocality"`
 	ConsumedLocalOnly bool           `yaml:"consumedLocalOnly" json:"consumedLocalOnly"`
 	IsLocal           bool           `yaml:"isLocal" json:"isLocal"`
+	LivenessInterval  int            `yaml:"livenessInterval" json:"livenessInterval,omitempty"`
+	Links            _links       	 `json:"_links,omitempty"`
+	SerInstanceId     string         `json:"serInstanceId,omitempty"`
+}
+
+type ServiceInfo struct {
+	SerName           string         `json:"serName"`
+	Version           string         `json:"version"`
+
 }
 
 type CategoryRef struct {
@@ -102,4 +111,12 @@ type SerAvailabilityNotificationSubscriptionFilteringCriteria struct {
 	SerCategories  []CategoryRef  `yaml:"serCategories" json:"serCategories"`
 	States         []ServiceState `yaml:"states" json:"states"`
 	IsLocal        bool           `yaml:"isLocal" json:"isLocal"`
+}
+
+type _links struct {
+	Self LivenessLinktype `yaml:"self" json:"self"`
+}
+
+type LivenessLinktype struct {
+	Liveness string `json:"liveness"`
 }

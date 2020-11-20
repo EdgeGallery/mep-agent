@@ -44,6 +44,7 @@ serviceInfoPosts:
     scopeOfLocality: MEC_SYSTEM
     consumedLocalOnly: false
     isLocal: true
+    livenessInterval: 10
 serAvailabilityNotificationSubscriptions:
   - subscriptionType: SerAvailabilityNotificationSubscription
     callbackReference: string

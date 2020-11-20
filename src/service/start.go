@@ -21,6 +21,7 @@ import (
 	"mep-agent/src/model"
 	"mep-agent/src/util"
 	"sync"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -56,11 +57,42 @@ func (ser *Ser) Start(confPath string, ak string, sk *[]byte, wg *sync.WaitGroup
 	// register service to mep with token
 	// only ServiceInfo not nil
 	if conf.ServiceInfoPosts != nil {
-		errRegisterToMep := RegisterToMep(conf, token, wg)
+		responseBody, errRegisterToMep := RegisterToMep(conf, token, wg)
 		if errRegisterToMep != nil {
 			log.Error("failed to register to mep: " + errRegisterToMep.Error())
 			return token
 		}
+
+		for _, serviceInfo := range responseBody {
+			if serviceInfo.LivenessInterval != 0 && serviceInfo.Links.Self.Liveness != "" {
+				wg.Add(1)
+				go heartBeatTicker(serviceInfo, token, wg)
+			} else {
+				log.Error("Liveness heartbeat is not configured, service name is " + serviceInfo.SerName)
+			}
+		}
 	}
 	return token
+}
+
+func heartBeatTicker(serviceInfo model.ServiceInfoPost,  token *model.TokenModel, wg *sync.WaitGroup) {
+	ticker := time.NewTicker(time.Duration(serviceInfo.LivenessInterval) * time.Second)
+	log.Info("Liveness Interval time ", serviceInfo.LivenessInterval)
+	done := make(chan bool)
+	 go func(serviceInfo model.ServiceInfoPost,  token *model.TokenModel) {
+		for {
+			select {
+			case <-done:
+				return
+			case <-ticker.C:
+				 go HeartBeatRequestToMep(serviceInfo, token)
+			}
+		}
+	}(serviceInfo, token)
+
+	time.Sleep(5 * time.Minute)
+	wg.Done()
+	ticker.Stop()
+	done <- true
+
 }
