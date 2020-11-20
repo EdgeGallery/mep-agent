@@ -54,10 +54,13 @@ func (ser *Ser) Start(confPath string, ak string, sk *[]byte, wg *sync.WaitGroup
 	}
 
 	// register service to mep with token
-	errRegisterToMep := RegisterToMep(conf, token, wg)
-	if errRegisterToMep != nil {
-		log.Error("failed to register to mep: " + errRegisterToMep.Error())
-		return token
+	// only ServiceInfo not nil
+	if conf.ServiceInfoPosts != nil {
+		errRegisterToMep := RegisterToMep(conf, token, wg)
+		if errRegisterToMep != nil {
+			log.Error("failed to register to mep: " + errRegisterToMep.Error())
+			return token
+		}
 	}
 	return token
 }
