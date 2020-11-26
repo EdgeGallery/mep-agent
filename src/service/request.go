@@ -214,3 +214,31 @@ func getCipherSuites(sslCiphers string) []uint16 {
 	}
 	return nil
 }
+
+// Send Service heartbeat to MEP
+func SendHeartBeatRequest(heartBeatData HeartBeatData) (string, error) {
+	req, errNewRequest := http.NewRequest("PUT", heartBeatData.url, strings.NewReader(heartBeatData.data))
+	if errNewRequest != nil {
+		return "", errNewRequest
+	}
+	req.Header.Set("Authorization", heartBeatData.token.TokenType+" "+heartBeatData.token.AccessToken)
+
+	response, errDo := DoRequest(req)
+	if errDo != nil {
+		return "", errDo
+	}
+
+	defer response.Body.Close()
+	body, err2 := ioutil.ReadAll(response.Body)
+	if err2 != nil {
+		return "", err2
+	}
+	log.Info("response is received")
+	log.Info("Status code ", response.StatusCode)
+
+	if response.StatusCode == http.StatusOK || response.StatusCode == http.StatusNoContent{
+		return string(body), nil
+	} else  {
+		return "", errors.New("heartbeat request failed, status is " + strconv.Itoa(response.StatusCode))
+	}
+}

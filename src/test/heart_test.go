@@ -20,36 +20,27 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"github.com/agiledragon/gomonkey"
+	log "github.com/sirupsen/logrus"
 	"github.com/smartystreets/goconvey/convey"
 	"mep-agent/src/config"
 	"mep-agent/src/model"
 	"mep-agent/src/service"
 	"net/http"
 	"net/http/httptest"
-	"sync"
 	"testing"
 )
 
 // Tests register service to mep
-func TestRegisterToMep(t *testing.T)  {
-	convey.Convey("RegisterToMep", t, func() {
+func TestHeartBeatRequestToMep(t *testing.T)  {
+	convey.Convey("HeartBeatRequestToMep", t, func() {
 		registerResponse := string(`{"serName": "get", "livenessInterval": 30, "serInstanceId":"12345", "_links": { "self" : { "liveness": "/mec_service_mgmt/v1/applications/5abe4782-2c70-4e47-9a4e-0ee3a1a0fd1f/service/5abe4782-2c70-4e47-9a4e-0ee3a1a0fd1f/liveness" }}}`)
-		var waitRoutineFinish sync.WaitGroup
-		httpResponseBytes, errMarshal := json.Marshal(registerResponse)
-		if errMarshal != nil {
-			t.Error("Marshal http Response Error: " + errMarshal.Error())
-		}
 
 		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusCreated)
-			_, err2 := w.Write(httpResponseBytes)
-			if err2 != nil {
-				t.Error("Write Response Error")
-			}
-		}))
+			w.WriteHeader(http.StatusNoContent)
 
+		}))
 		patch1 := gomonkey.ApplyFunc(config.GetServerUrl, func() (config.ServerUrl, error) {
-			return config.ServerUrl{MepServerRegisterUrl: ts.URL}, nil
+			return config.ServerUrl{MepHeartBeatUrl: ts.URL}, nil
 		})
 		patch2 := gomonkey.ApplyFunc(service.TlsConfig, func() (*tls.Config, error) {
 			return nil, nil
@@ -59,15 +50,13 @@ func TestRegisterToMep(t *testing.T)  {
 		defer patch1.Reset()
 		defer patch2.Reset()
 
-		conf, errGetConf := service.GetAppInstanceConf("../../conf/app_instance_info.yaml")
-		if errGetConf != nil {
-			t.Error(errGetConf.Error())
-		}
-
 		var token = model.TokenModel{AccessToken: "akakak", TokenType: "Bear", ExpiresIn: 3600}
-		_, errRegister := service.RegisterToMep(conf, &token, &waitRoutineFinish)
-		if errRegister != nil {
-			t.Error(errRegister.Error())
+
+		serviceInfo := model.ServiceInfoPost{}
+		errJsonUnMarshal := json.Unmarshal([]byte(registerResponse), &serviceInfo)
+		if errJsonUnMarshal !=nil {
+			log.Error("Failed to marshal service info to object", errJsonUnMarshal.Error())
 		}
+		service.HeartBeatRequestToMep(serviceInfo, &token)
 	})
 }
