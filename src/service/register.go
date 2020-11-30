@@ -46,10 +46,10 @@ type RegisterData struct {
 var dataStore []model.ServiceInfoPost
 
 // Registers service to mep
-func RegisterToMep(conf model.AppInstanceInfo, token *model.TokenModel, wg *sync.WaitGroup) ([]model.ServiceInfoPost, error) {
+func RegisterToMep(conf model.AppInstanceInfo, wg *sync.WaitGroup) ([]model.ServiceInfoPost, error) {
 	log.Info("begin to register service to mep")
 	serviceInfos := conf.ServiceInfoPosts
-	appInstanceId := conf.AppInstanceId
+	appInstanceId := util.AppInstanceId
 
 	if len(serviceInfos) > MAX_SERVICE_COUNT {
 		log.Error("Failed to register all the services to mep, appInstanceId is " + appInstanceId)
@@ -73,7 +73,7 @@ func RegisterToMep(conf model.AppInstanceInfo, token *model.TokenModel, wg *sync
 			log.Error("Failed to marshal service info to object")
 			continue
 		}
-		var registerData = RegisterData{data: string(data), url: url, token: token}
+		var registerData = RegisterData{data: string(data), url: url, token: &util.MepToken}
 		resBody, errPostRequest := PostRegisterRequest(registerData)
 		if errPostRequest != nil {
 			log.Error("Failed to register to mep, appInstanceId is " + appInstanceId +

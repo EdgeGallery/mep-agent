@@ -35,64 +35,53 @@ func BeginService() *Ser {
 }
 
 // service entrance
-func (ser *Ser) Start(confPath string, ak string, sk *[]byte, wg *sync.WaitGroup) *model.TokenModel {
+func (ser *Ser) Start(confPath string, ak string, sk *[]byte) {
 
+	var wg = &sync.WaitGroup{}
 	// read app_instance_info.yaml file and transform to AppInstanceInfo object
 	conf, errGetConf := GetAppInstanceConf(confPath)
 	if errGetConf != nil {
-		// clear sk
-		util.ClearByteArray(*sk)
 		log.Error("parse app_instance_info.yaml failed.")
-		return nil
+		return
 	}
-
+	_, errAppInst := util.GetAppInstanceId()
+	if errAppInst != nil {
+		log.Error("get app instance id failed.")
+		return
+	}
 	// signed ak and sk, then request the token
 	var auth = model.Auth{AccessKey: ak, SecretKey: sk}
-	token, errGetMepToken := GetMepToken(auth)
+	errGetMepToken := GetMepToken(auth)
 	if errGetMepToken != nil {
 		log.Error("get token failed.")
-		return nil
+		return
 	}
+	util.FirstToken = true
 
 	// register service to mep with token
 	// only ServiceInfo not nil
 	if conf.ServiceInfoPosts != nil {
-		responseBody, errRegisterToMep := RegisterToMep(conf, token, wg)
+		responseBody, errRegisterToMep := RegisterToMep(conf, wg)
 		if errRegisterToMep != nil {
 			log.Error("failed to register to mep: " + errRegisterToMep.Error())
-			return token
+			return
 		}
 
 		for _, serviceInfo := range responseBody {
 			if serviceInfo.LivenessInterval != 0 && serviceInfo.Links.Self.Liveness != "" {
 				wg.Add(1)
-				go heartBeatTicker(serviceInfo, token, wg)
+				heartBeatTicker(serviceInfo)
 			} else {
 				log.Error("Liveness heartbeat is not configured, service name is " + serviceInfo.SerName)
 			}
 		}
 	}
-	return token
+
+	wg.Wait()
 }
 
-func heartBeatTicker(serviceInfo model.ServiceInfoPost,  token *model.TokenModel, wg *sync.WaitGroup) {
-	ticker := time.NewTicker(time.Duration(serviceInfo.LivenessInterval) * time.Second)
-	log.Info("Liveness Interval time ", serviceInfo.LivenessInterval)
-	done := make(chan bool)
-	 go func(serviceInfo model.ServiceInfoPost,  token *model.TokenModel) {
-		for {
-			select {
-			case <-done:
-				return
-			case <-ticker.C:
-				 go HeartBeatRequestToMep(serviceInfo, token)
-			}
-		}
-	}(serviceInfo, token)
-
-	time.Sleep(5 * time.Minute)
-	wg.Done()
-	ticker.Stop()
-	done <- true
-
+func heartBeatTicker(serviceInfo model.ServiceInfoPost) {
+	for range time.Tick(time.Duration(serviceInfo.LivenessInterval) * time.Second) {
+		go HeartBeatRequestToMep(serviceInfo)
+	}
 }

@@ -23,6 +23,7 @@ import (
 	"mep-agent/src/config"
 	"mep-agent/src/model"
 	"time"
+	"mep-agent/src/util"
 )
 
 type HeartBeatData struct {
@@ -41,7 +42,7 @@ func Heart() {
 }
 
 // Send service heartbeat to MEP
-func HeartBeatRequestToMep(serviceInfo model.ServiceInfoPost, token *model.TokenModel) {
+func HeartBeatRequestToMep(serviceInfo model.ServiceInfoPost) {
 
 	heartBeatRequest := ServiceLivenessUpdate{State: "ACTIVE"}
 	data, errJsonMarshal := json.Marshal(heartBeatRequest)
@@ -55,7 +56,7 @@ func HeartBeatRequestToMep(serviceInfo model.ServiceInfoPost, token *model.Token
 	}
 
 	url := server.MepHeartBeatUrl + serviceInfo.Links.Self.Liveness
-	var heartBeatData = HeartBeatData{data: string(data), url: url, token: token}
+	var heartBeatData = HeartBeatData{data: string(data), url: url, token: &util.MepToken}
 	_, errPostRequest := SendHeartBeatRequest(heartBeatData)
 	if errPostRequest != nil {
 		log.Error("Failed heart beat request to mep, URL is " + url)

@@ -100,15 +100,12 @@ func PostRegisterRequest(registerData RegisterData) (string, error) {
 
 // get token from mep
 func PostTokenRequest(param string, url string, auth model.Auth) (string, error) {
-
 	// construct http request
 	req, errNewRequest := http.NewRequest("POST", url, strings.NewReader(param))
 	if errNewRequest != nil {
-		// clear sk
-		sk := auth.SecretKey
-		util.ClearByteArray(*sk)
 		return "", errNewRequest
 	}
+
 	// request header
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set(util.DATE_HEADER, time.Now().Format(util.DATE_FORMAT))

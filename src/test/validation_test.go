@@ -29,7 +29,7 @@ func TestValidateIp(t *testing.T) {
         })
 
         convey.Convey("ValidateIpFail", func() {
-            convey.So(util.ValidateIp("127.0.0"), convey.ShouldNotBeNil)
+            convey.So(util.ValidateIp("127.0.0."), convey.ShouldNotBeNil)
         })
     })
 }

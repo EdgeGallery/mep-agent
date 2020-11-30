@@ -17,6 +17,20 @@
 // Clear util
 package util
 
+import (
+	"errors"
+	log "github.com/sirupsen/logrus"
+	"mep-agent/src/model"
+	"os"
+)
+
+type AppConfigProperties map[string]*[]byte
+
+var AppConfig = AppConfigProperties{}
+var MepToken = model.TokenModel{}
+var FirstToken = false
+var AppInstanceId  string
+
 // Clears byte array
 func ClearByteArray(data []byte) {
 	if data == nil {
@@ -27,9 +41,37 @@ func ClearByteArray(data []byte) {
 	}
 }
 
-// clear [string, *[]byte] map
-func ClearMap(maps map[string]*[]byte){
-	for _, element := range maps {
+// clear [string, *[]byte] map, called only in error case
+func ClearMap(){
+	for _, element := range AppConfig {
 		ClearByteArray(*element)
 	}
+}
+
+//read and clearing the variable from the environment
+func ReadTokenFromEnvironment() error {
+	if len(os.Getenv("AK")) == 0 || len(os.Getenv("SK")) == 0 {
+		err := errors.New("AK and SK keys should be set in env variable")
+		log.Error("Keys should not be empty")
+		return err
+	}
+	AK := []byte(os.Getenv("AK"))
+	AppConfig["ACCESS_KEY"] = &AK
+	SK := []byte(os.Getenv("SK"))
+	AppConfig["SECRET_KEY"] = &SK
+
+	//clean the environment
+	os.Unsetenv("AK")
+	os.Unsetenv("SK")
+	return nil
+}
+
+func GetAppInstanceId() (string, error) {
+	if len(os.Getenv("APPINSTID")) == 0  {
+		err := errors.New("APPINSTID should be set in env variable")
+		log.Error("AppInstanceId must be set")
+		return "", err
+	}
+	AppInstanceId = os.Getenv("APPINSTID")
+	return AppInstanceId, nil
 }

@@ -24,8 +24,10 @@ import (
 	"mep-agent/src/config"
 	"mep-agent/src/model"
 	"mep-agent/src/service"
+	"mep-agent/src/util"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"sync"
 	"testing"
 )
@@ -54,18 +56,28 @@ func TestRegisterToMep(t *testing.T)  {
 		patch2 := gomonkey.ApplyFunc(service.TlsConfig, func() (*tls.Config, error) {
 			return nil, nil
 		})
-
+		patch3 := gomonkey.ApplyFunc(util.GetAppInstanceId, func() (string , error) {
+			return "", nil
+		})
 		defer ts.Close()
 		defer patch1.Reset()
 		defer patch2.Reset()
+		defer patch3.Reset()
 
-		conf, errGetConf := service.GetAppInstanceConf("../../conf/app_instance_info.yaml")
+		conf, errGetConf := service.GetAppInstanceConf("" +
+			"app_instance_info.yaml")
 		if errGetConf != nil {
 			t.Error(errGetConf.Error())
 		}
+		os.Setenv("APPINSTID", "5abe4782-2c70-4e47-9a4e-0ee3a1a0fd1f")
+		_, errAppInst := util.GetAppInstanceId()
+		if errAppInst != nil {
+			t.Error(errGetConf.Error())
+		}
+		util.MepToken = model.TokenModel{AccessToken: "akakak", TokenType: "Bear", ExpiresIn: 3600}
+		util.AppInstanceId = "5abe4782-2c70-4e47-9a4e-0ee3a1a0fd1f"
 
-		var token = model.TokenModel{AccessToken: "akakak", TokenType: "Bear", ExpiresIn: 3600}
-		_, errRegister := service.RegisterToMep(conf, &token, &waitRoutineFinish)
+		_, errRegister := service.RegisterToMep(conf, &waitRoutineFinish)
 		if errRegister != nil {
 			t.Error(errRegister.Error())
 		}
