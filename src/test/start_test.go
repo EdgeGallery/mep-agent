@@ -29,23 +29,21 @@ import (
 func TestStartSuccess(t *testing.T) {
 
 	convey.Convey("Start", t, func() {
-		var waitRoutineFinish sync.WaitGroup
 		var dataStore []model.ServiceInfoPost
 		data := model.ServiceInfoPost{LivenessInterval : 1}
 		dataStore = append(dataStore,data)
 		patch1 := gomonkey.ApplyFunc(service.GetAppInstanceConf, func(path string) (model.AppInstanceInfo, error) {
 			return model.AppInstanceInfo{}, nil
 		})
-		patch2 := gomonkey.ApplyFunc(service.GetMepToken, func(auth model.Auth) (*model.TokenModel, error) {
-			return &model.TokenModel{}, nil
+		patch2 := gomonkey.ApplyFunc(service.GetMepToken, func(auth model.Auth) (error) {
+			return nil
 		})
 		patch3 := gomonkey.ApplyFunc(service.RegisterToMep, func(conf model.AppInstanceInfo,
-			                                                     token *model.TokenModel,
 			                                                     wg *sync.WaitGroup)([]model.ServiceInfoPost, error) {
 			return dataStore, nil
 		})
 		skByte := []byte("secretKey")
-		service.BeginService().Start("../../conf/app_instance_info.yaml", "accessKey", &skByte, &waitRoutineFinish)
+		service.BeginService().Start("../../conf/app_instance_info.yaml", "accessKey", &skByte)
 
 		defer patch1.Reset()
 		defer patch2.Reset()

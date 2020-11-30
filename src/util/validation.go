@@ -30,6 +30,7 @@ const (
 	AK_PATTERN   string = `^\w{20}$`
 	SK_PATTERN   string = `^\w{64}$`
 	DOMAIN_PATTERN string = `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$`
+	DNS_PATTERN string = `^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`
 	maxHostNameLen = 253
 )
 
@@ -39,7 +40,7 @@ func ValidateIp(ip string) error {
 	if ipv != nil {
 		return nil
 	}
-	return ValidateByPattern(IP_PATTERN, ip)
+	return ValidateByPattern(DNS_PATTERN, ip)
 }
 
 // Validates domain name

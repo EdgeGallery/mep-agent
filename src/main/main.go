@@ -17,122 +17,50 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
-	"mep-agent/src/model"
+	"github.com/astaxie/beego"
+	log "github.com/sirupsen/logrus"
+	"mep-agent/src/controllers"
+	_ "mep-agent/src/router"
 	"mep-agent/src/service"
 	"mep-agent/src/util"
 	"os"
-	"path/filepath"
-	"strconv"
-	"sync"
-	"unsafe"
-
-	log "github.com/sirupsen/logrus"
 )
 
-type AppConfigProperties map[string]*[]byte
 
 func main() {
-
-	// read mepagent.properties file to AppConfigProperties object
-	configFilePath := filepath.FromSlash("/usr/mep/mepagent.properties")
-	appConfig, err := readPropertiesFile(configFilePath)
+	// reading and cleaning the token from environment
+	err := util.ReadTokenFromEnvironment()
 	if err != nil {
-		log.Error("Failed to read the config parameters from properties file")
+		log.Error("Failed to read the token from environment variables")
+		util.ClearMap()
 		os.Exit(1)
-	}
-
-	// clear mepagent.properties file
-	err = os.Truncate(configFilePath, 0)
-	if err != nil {
-		util.ClearMap(appConfig)
-		os.Exit(1)
-	}
-
-	enableWait := false
-
-	// wait before exit if only enabled by environment variable
-	if waitStatus := os.Getenv("ENABLE_WAIT"); waitStatus != "" {
-		if waitFlag, err := strconv.ParseBool(waitStatus); err == nil {
-			enableWait = waitFlag
-		}
 	}
 
 	// validate ACCESS_KEY and SECRET_KEY with nil, length and regex
-	if appConfig["ACCESS_KEY"] == nil || len(*appConfig["ACCESS_KEY"]) == 0 {
+	if util.AppConfig["ACCESS_KEY"] == nil || len(*util.AppConfig["ACCESS_KEY"]) == 0 {
 		log.Info("The input param of ak is invalid")
-		util.ClearMap(appConfig)
+		util.ClearMap()
 		os.Exit(1)
 	}
-	if appConfig["SECRET_KEY"] == nil || len(*appConfig["SECRET_KEY"]) == 0 {
+
+	if util.AppConfig["SECRET_KEY"] == nil || len(*util.AppConfig["SECRET_KEY"]) == 0 {
 		log.Info("The input param of sk is invalid")
-		util.ClearMap(appConfig)
+		util.ClearMap()
 		os.Exit(1)
 	}
-	if err := util.ValidateAkSk(string(*appConfig["ACCESS_KEY"]), appConfig["SECRET_KEY"]); err != nil {
+
+	if err := util.ValidateAkSk(string(*util.AppConfig["ACCESS_KEY"]), util.AppConfig["SECRET_KEY"]); err != nil {
 		log.Info("the input param of ak or sk do not pass the validation")
-		util.ClearMap(appConfig)
+		util.ClearMap()
 		os.Exit(1)
 	}
 
-	sk := appConfig["SECRET_KEY"]
-	var waitRoutineFinish sync.WaitGroup
-
+	sk := util.AppConfig["SECRET_KEY"]
 	// start main service
-	token := service.BeginService().Start("./conf/app_instance_info.yaml",
-		string(*appConfig["ACCESS_KEY"]), sk, &waitRoutineFinish)
-	waitRoutineFinish.Wait()
-	if token != nil {
-		// clear access_token
-		accessToken := *(*[]byte)(unsafe.Pointer(&token.AccessToken))
-		util.ClearByteArray(accessToken)
-		*token = model.TokenModel{}
-	}
+	go service.BeginService().Start("./conf/app_instance_info.yaml",
+		string(*util.AppConfig["ACCESS_KEY"]), sk)
 
-	// service heart
-	if enableWait {
-		service.Heart()
-	}
+	log.Info("Starting server")
+	beego.ErrorController(&controllers.ErrorController{})
+	beego.Run()
 }
-
-// read mepagent.properties file to AppConfigProperties object
-func readPropertiesFile(filePath string) (AppConfigProperties, error) {
-	var config AppConfigProperties
-
-	// validate path length and open the file
-	if len(filePath) == 0 {
-		return config, nil
-	}
-	file, err := os.Open(filePath)
-	if err != nil {
-		log.Error("Failed to open the file.")
-		return nil, err
-	}
-	defer file.Close()
-
-	// scanner the file and transform to AppConfigProperties object
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Bytes()
-		config = transformLineToAppConfigProperties(line, config)
-	}
-	if err := scanner.Err(); err != nil {
-		log.Error("Failed to read the file.")
-		util.ClearMap(config)
-		return nil, err
-	}
-	return config, nil
-}
-
-func transformLineToAppConfigProperties(line []byte, config AppConfigProperties) AppConfigProperties {
-	if bytes.Contains(line, []byte("=")) {
-		keyVal := bytes.Split(line, []byte("="))
-		key := bytes.TrimSpace(keyVal[0])
-		val := bytes.TrimSpace(keyVal[1])
-		config[string(key)] = &val
-	}
-	return config
-}
-
-

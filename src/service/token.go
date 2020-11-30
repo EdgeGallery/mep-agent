@@ -19,43 +19,36 @@ package service
 
 import (
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
 	"mep-agent/src/config"
 	"mep-agent/src/model"
 	"mep-agent/src/util"
 	"unsafe"
-	log "github.com/sirupsen/logrus"
 )
 
 // Request token from mep_auth
-func GetMepToken(auth model.Auth) (*model.TokenModel, error) {
-
-	log.Info("begin to get token from mep_auth")
-
+func GetMepToken(auth model.Auth) (error) {
 	// get request url
 	server, errGetServer := config.GetServerUrl()
 	if errGetServer != nil {
-		// clear sk
-		sk := auth.SecretKey
-		util.ClearByteArray(*sk)
-		return nil, errGetServer
+		return errGetServer
 	}
 
 	// construct http request and send
 	resp, errPostRequest := PostTokenRequest("", server.MepAuthUrl, auth)
 	if errPostRequest != nil {
-		return nil, errPostRequest
+		return errPostRequest
 	}
 
 	// unmarshal resp to object
-	var token model.TokenModel
-	errJson := json.Unmarshal([]byte(resp), &token)
+	errJson := json.Unmarshal([]byte(resp), &util.MepToken)
 
 	// clear resp
 	util.ClearByteArray(*(*[]byte)(unsafe.Pointer(&resp)))
 	if errJson != nil {
-		return nil, errJson
+		return errJson
 	}
 
 	log.Info("get token success.")
-	return &token, nil
+	return nil
 }

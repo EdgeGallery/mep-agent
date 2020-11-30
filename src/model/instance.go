@@ -18,7 +18,6 @@
 package model
 
 type AppInstanceInfo struct {
-	AppInstanceId                            string                                    `yaml:"appInstanceId" json:"appInstanceId"`
 	ServiceInfoPosts                         []ServiceInfoPost                         `yaml:"serviceInfoPosts" json:"serviceInfoPosts"`
 	SerAvailabilityNotificationSubscriptions []SerAvailabilityNotificationSubscription `yaml:"serAvailabilityNotificationSubscriptions" json:"serAvailabilityNotificationSubscriptions"`
 }

@@ -59,7 +59,7 @@ func TestGetMepToken(t *testing.T) {
 		})
 
 		sk := []byte("sksksk")
-		_, err := service.GetMepToken(model.Auth{AccessKey: "akakak", SecretKey: &sk})
+		err := service.GetMepToken(model.Auth{AccessKey: "akakak", SecretKey: &sk})
 		if err != nil {
 			t.Error(err.Error())
 		}

@@ -25,6 +25,7 @@ import (
 	"mep-agent/src/config"
 	"mep-agent/src/model"
 	"mep-agent/src/service"
+	"mep-agent/src/util"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -50,13 +51,13 @@ func TestHeartBeatRequestToMep(t *testing.T)  {
 		defer patch1.Reset()
 		defer patch2.Reset()
 
-		var token = model.TokenModel{AccessToken: "akakak", TokenType: "Bear", ExpiresIn: 3600}
+		util.MepToken = model.TokenModel{AccessToken: "akakak", TokenType: "Bear", ExpiresIn: 3600}
 
 		serviceInfo := model.ServiceInfoPost{}
 		errJsonUnMarshal := json.Unmarshal([]byte(registerResponse), &serviceInfo)
 		if errJsonUnMarshal !=nil {
 			log.Error("Failed to marshal service info to object", errJsonUnMarshal.Error())
 		}
-		service.HeartBeatRequestToMep(serviceInfo, &token)
+		service.HeartBeatRequestToMep(serviceInfo)
 	})
 }

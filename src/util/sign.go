@@ -41,6 +41,7 @@ const (
 	DATE_HEADER    string = "x-sdk-date"
 )
 
+
 type Sign struct {
 	SecretKey *[]byte
 	AccessKey string
@@ -59,25 +60,16 @@ func (sig *Sign) GetAuthorizationValueWithSign(req *http.Request) (string, error
 // get signature from request
 func (sig *Sign) GetSignature(req *http.Request) (string, error) {
 	if req == nil {
-		// clear sk
-		sk := sig.SecretKey
-		ClearByteArray(*sk)
 		return "", errors.New("request is nil")
 	}
 	// construct canonical request
 	canonicalRequest, errGetCanonicalRequest := getCanonicalRequest(req)
 	if errGetCanonicalRequest != nil {
-		// clear sk
-		sk := sig.SecretKey
-		ClearByteArray(*sk)
 		return "", errGetCanonicalRequest
 	}
 	// create string to sign
 	stringToSign, errGetStringToSign := getStringToSign(canonicalRequest, req.Header.Get(DATE_HEADER))
 	if errGetStringToSign != nil {
-		// clear sk
-		sk := sig.SecretKey
-		ClearByteArray(*sk)
 		return "", errGetStringToSign
 	}
 	// calculate signature
@@ -238,7 +230,7 @@ func calculateSignature(stringToSign string, secretKey *[]byte) (encodeStr strin
 	}()
 	h := hmac.New(sha256.New, *secretKey)
 	// clear secret key
-	ClearByteArray(*secretKey)
+	//ClearByteArray(*secretKey)
 	_, errWrite := h.Write([]byte(stringToSign))
 	if errWrite != nil {
 		return "", errWrite

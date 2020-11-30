@@ -19,6 +19,7 @@ package test
 import (
     "github.com/stretchr/testify/assert"
     "mep-agent/src/util"
+    "os"
     "testing"
 )
 
@@ -30,4 +31,20 @@ func TestClearByteArray(t *testing.T) {
 
     util.ClearByteArray(nil)
 
+}
+
+func TestReadTokenFromEnvironment1(t *testing.T){
+    os.Setenv("AK", "exampleAK")
+    os.Setenv("SK", "exampleSK")
+    err := util.ReadTokenFromEnvironment()
+    assert.EqualValues(t, 0, len(os.Getenv("AK")))
+    assert.EqualValues(t, 0, len(os.Getenv("SK")))
+    assert.NoError(t, err, "No error is expected")
+}
+
+func TestReadTokenFromEnvironment2(t *testing.T){
+    os.Setenv("AK", "exampleAK")
+    err := util.ReadTokenFromEnvironment()
+    Expected := "AK and SK keys should be set in env variable"
+    assert.EqualError(t, err, Expected)
 }
