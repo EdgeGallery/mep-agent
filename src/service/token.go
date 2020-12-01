@@ -23,6 +23,7 @@ import (
 	"mep-agent/src/config"
 	"mep-agent/src/model"
 	"mep-agent/src/util"
+	"time"
 	"unsafe"
 )
 
@@ -50,5 +51,41 @@ func GetMepToken(auth model.Auth) (error) {
 	}
 
 	log.Info("get token success.")
+
+	//start timer to refresh token
+	go startRefreshTimer()
 	return nil
 }
+
+// This function will be only call by GetMepToken
+func startRefreshTimer() {
+	defer func() {
+		if err1 := recover(); err1 != nil {
+			log.Error("panic handled:", err1)
+		}
+	}()
+	if util.RefresTimer != nil {
+		ok := util.RefresTimer.Stop()
+		if ok {
+			log.Info("timer stopped")
+		} else {
+			log.Info("timer not yet started")
+		}
+	}
+	//start timer with latest token expiry value - buffertime
+	util.RefresTimer = time.NewTimer(time.Duration(util.MepToken.ExpiresIn - util.RefreshTimeBuffer) * time.Second)
+	log.Info("Refresh timer started")
+	go func() {
+		_, ok := <-util.RefresTimer.C
+		if !ok {
+			log.Error("Timer C channel closed")
+		}
+		var auth = model.Auth{SecretKey: util.AppConfig["SECRET_KEY"], AccessKey: string(*util.AppConfig["ACCESS_KEY"])}
+		errGetMepToken := GetMepToken(auth)
+		if errGetMepToken != nil {
+			log.Error("Get token failed.")
+			return
+		}
+	}()
+}
+

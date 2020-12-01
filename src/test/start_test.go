@@ -21,6 +21,7 @@ import (
 	"github.com/smartystreets/goconvey/convey"
 	"mep-agent/src/model"
 	"mep-agent/src/service"
+	"mep-agent/src/util"
 	"sync"
 	"testing"
 )
@@ -42,8 +43,14 @@ func TestStartSuccess(t *testing.T) {
 			                                                     wg *sync.WaitGroup)([]model.ServiceInfoPost, error) {
 			return dataStore, nil
 		})
-		skByte := []byte("secretKey")
-		service.BeginService().Start("../../conf/app_instance_info.yaml", "accessKey", &skByte)
+
+		AK := []byte("accessKey")
+		util.AppConfig["ACCESS_KEY"] = &AK
+		SK := []byte("secretKey")
+		util.AppConfig["SECRET_KEY"] = &SK
+
+
+		service.BeginService().Start("../../conf/app_instance_info.yaml")
 
 		defer patch1.Reset()
 		defer patch2.Reset()

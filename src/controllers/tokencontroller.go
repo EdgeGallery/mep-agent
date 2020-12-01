@@ -19,8 +19,6 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	log "github.com/sirupsen/logrus"
-	"mep-agent/src/model"
-	svc "mep-agent/src/service"
 	"mep-agent/src/util"
 )
 
@@ -28,27 +26,15 @@ type TokenController struct {
 	beego.Controller
 }
 
-type TokenModel struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	ExpiresIn   uint32 `json:"expires_in"`
-}
-
 // Get /mep-agent/v1/token function
 func (c *TokenController) Get() {
+	log.Info("received get token request from app")
 	if !util.FirstToken {
 		log.Error("First Token not yet received.")
 		c.Ctx.ResponseWriter.WriteHeader(412)
 		return
 	}
-	// signed ak and sk, then request the token
-	var auth = model.Auth{SecretKey: util.AppConfig["SECRET_KEY"], AccessKey: string(*util.AppConfig["ACCESS_KEY"])}
-	errGetMepToken := svc.GetMepToken(auth)
-	if errGetMepToken != nil {
-		log.Error("Get token failed.")
-		c.Ctx.ResponseWriter.WriteHeader(400)
-		return
-	}
+	// Get the last token
 	c.Data["json"] = &util.MepToken
 	c.Ctx.ResponseWriter.WriteHeader(200)
 	c.ServeJSON()
