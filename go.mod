@@ -3,6 +3,7 @@ module mep-agent
 go 1.14
 
 require (
+	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/agiledragon/gomonkey v2.0.1+incompatible
 	github.com/astaxie/beego v1.12.0
 	github.com/go-playground/validator/v10 v10.2.0

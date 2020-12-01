@@ -52,29 +52,6 @@ func TestGetForTokenNil(t *testing.T) {
 	assert.Equal(t, 412, response.Code, "get failed")
 }
 
-func TestGetForInvalid(t *testing.T) {
-
-	defer func() {
-		if r := recover(); r != nil {
-			t.Errorf(panicFormatString, r)
-		}
-	}()
-	util.FirstToken = true
-	AppConfigProperties := make(map[string]*[]byte)
-	sk := []byte("sksksk")
-	ak := []byte("akakak")
-
-	AppConfigProperties["SECRET_KEY"] = &sk
-	AppConfigProperties["ACCESS_KEY"] = &ak
-	util.AppConfig = AppConfigProperties
-	getBeegoController := beego.Controller{Ctx: &context.Context{ResponseWriter: &context.Response{ResponseWriter: httptest.NewRecorder()}},
-		Data: make(map[interface{}]interface{})}
-	getController := &controller.TokenController{Controller: getBeegoController}
-	response := getController.Ctx.ResponseWriter.ResponseWriter.(*httptest.ResponseRecorder)
-	getController.Get()
-
-	assert.Equal(t, 400, response.Code, "get failed")
-}
 
 func TestGet(t *testing.T) {
 

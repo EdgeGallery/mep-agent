@@ -55,10 +55,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	sk := util.AppConfig["SECRET_KEY"]
 	// start main service
-	go service.BeginService().Start("./conf/app_instance_info.yaml",
-		string(*util.AppConfig["ACCESS_KEY"]), sk)
+	go service.BeginService().Start("./conf/app_instance_info.yaml")
 
 	log.Info("Starting server")
 	beego.ErrorController(&controllers.ErrorController{})

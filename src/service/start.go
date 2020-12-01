@@ -35,7 +35,7 @@ func BeginService() *Ser {
 }
 
 // service entrance
-func (ser *Ser) Start(confPath string, ak string, sk *[]byte) {
+func (ser *Ser) Start(confPath string) {
 
 	var wg = &sync.WaitGroup{}
 	// read app_instance_info.yaml file and transform to AppInstanceInfo object
@@ -50,7 +50,7 @@ func (ser *Ser) Start(confPath string, ak string, sk *[]byte) {
 		return
 	}
 	// signed ak and sk, then request the token
-	var auth = model.Auth{AccessKey: ak, SecretKey: sk}
+	var auth = model.Auth{SecretKey: util.AppConfig["SECRET_KEY"], AccessKey: string(*util.AppConfig["ACCESS_KEY"])}
 	errGetMepToken := GetMepToken(auth)
 	if errGetMepToken != nil {
 		log.Error("get token failed.")
@@ -72,7 +72,7 @@ func (ser *Ser) Start(confPath string, ak string, sk *[]byte) {
 				wg.Add(1)
 				heartBeatTicker(serviceInfo)
 			} else {
-				log.Error("Liveness heartbeat is not configured, service name is " + serviceInfo.SerName)
+				log.Info("liveness is not configured or required")
 			}
 		}
 	}

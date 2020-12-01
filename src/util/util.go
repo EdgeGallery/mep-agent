@@ -22,14 +22,28 @@ import (
 	log "github.com/sirupsen/logrus"
 	"mep-agent/src/model"
 	"os"
+	"time"
 )
-
+//App configuration properties
 type AppConfigProperties map[string]*[]byte
 
+//Application configurations
 var AppConfig = AppConfigProperties{}
+
+// Token
 var MepToken = model.TokenModel{}
-var FirstToken = false
-var AppInstanceId  string
+
+//Mark initial token has been received
+var FirstToken      = false
+
+//App instance ID from configuration
+var AppInstanceId    string
+
+//Refresh token timer
+var RefresTimer      *time.Timer
+
+//Timer buffer 5 sec
+const RefreshTimeBuffer = 5
 
 // Clears byte array
 func ClearByteArray(data []byte) {
@@ -66,6 +80,7 @@ func ReadTokenFromEnvironment() error {
 	return nil
 }
 
+//Read application instanceId
 func GetAppInstanceId() (string, error) {
 	if len(os.Getenv("APPINSTID")) == 0  {
 		err := errors.New("APPINSTID should be set in env variable")

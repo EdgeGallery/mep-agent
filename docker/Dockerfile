@@ -69,7 +69,6 @@ RUN chmod 750 $HOME &&\
     chmod 550 -R $HOME/bin &&\
     chmod 640 $HOME/conf/app_conf.yaml &&\
     mkdir -p -m 750 /usr/mep/log &&\
-    mkdir -p -m 700 /usr/mep/ssl &&\
     chown -hR $USER_NAME:$GROUP_NAME $HOME
 
 # Change to the app user.

@@ -19,7 +19,6 @@ package service
 
 import (
 	"crypto/tls"
-	"crypto/x509"
 	"errors"
 	"io/ioutil"
 	"mep-agent/src/model"
@@ -158,14 +157,6 @@ func DoRequest(req *http.Request) (*http.Response, error) {
 
 // Constructs tls configuration
 func TlsConfig() (*tls.Config, error) {
-	crt, err := ioutil.ReadFile(os.Getenv("CA_CERT"))
-	if err != nil {
-		log.Error("Unable to read certificate")
-		return nil, err
-	}
-
-	rootCAs := x509.NewCertPool()
-	rootCAs.AppendCertsFromPEM(crt)
 	appConf, errGetConf := getAPPConf("./conf/app_conf.yaml")
 	if errGetConf != nil {
 		log.Error("parse app_conf.yaml failed")
@@ -184,10 +175,10 @@ func TlsConfig() (*tls.Config, error) {
 		return nil, errors.New("Domain name validation failed")
 	}
 	return &tls.Config{
-		RootCAs:      rootCAs,
 		ServerName:   domainName,
 		MinVersion:   tls.VersionTLS12,
 		CipherSuites: cipherSuites,
+		InsecureSkipVerify: true,
 	}, nil
 }
 
@@ -230,9 +221,6 @@ func SendHeartBeatRequest(heartBeatData HeartBeatData) (string, error) {
 	if err2 != nil {
 		return "", err2
 	}
-	log.Info("response is received")
-	log.Info("Status code ", response.StatusCode)
-
 	if response.StatusCode == http.StatusOK || response.StatusCode == http.StatusNoContent{
 		return string(body), nil
 	} else  {
