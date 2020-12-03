@@ -62,12 +62,15 @@ WORKDIR $HOME
 # Copy in the application exe.
 COPY --from=builder $HOME/main $HOME/bin
 COPY --from=builder $HOME/conf/ $HOME/conf/
+COPY --from=builder $HOME/views/ $HOME/views/
 
 # Create log and cert directory
 RUN chmod 750 $HOME &&\
     chmod 750 $HOME/conf &&\
     chmod 550 -R $HOME/bin &&\
     chmod 640 $HOME/conf/app_conf.yaml &&\
+    chmod 500 -R $HOME/views &&\
+    chmod 440 -R $HOME/views/error/404.tpl &&\
     mkdir -p -m 750 /usr/mep/log &&\
     chown -hR $USER_NAME:$GROUP_NAME $HOME
 

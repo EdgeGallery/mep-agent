@@ -34,8 +34,8 @@ func TestClearByteArray(t *testing.T) {
 }
 
 func TestReadTokenFromEnvironment1(t *testing.T){
-    os.Setenv("AK", "exampleAK")
-    os.Setenv("SK", "exampleSK")
+    os.Setenv("AK", "ZXhhbXBsZUFL")
+    os.Setenv("SK", "ZXhhbXBsZVNL")
     err := util.ReadTokenFromEnvironment()
     assert.EqualValues(t, 0, len(os.Getenv("AK")))
     assert.EqualValues(t, 0, len(os.Getenv("SK")))
@@ -43,8 +43,35 @@ func TestReadTokenFromEnvironment1(t *testing.T){
 }
 
 func TestReadTokenFromEnvironment2(t *testing.T){
-    os.Setenv("AK", "exampleAK")
+    os.Setenv("AK", "ZXhhbXBsZUFL")
     err := util.ReadTokenFromEnvironment()
-    Expected := "AK and SK keys should be set in env variable"
+    Expected := "ak and sk keys should be set in env variable"
+    assert.EqualError(t, err, Expected)
+}
+
+func TestReadTokenFromEnvironmentDecodeFailed(t *testing.T){
+    os.Setenv("AK", "ExampleAK")
+    os.Setenv("SK", "ExampleSK")
+    err := util.ReadTokenFromEnvironment()
+    Expected := "decode ak failed"
+    assert.EqualError(t, err, Expected)
+
+    os.Setenv("AK", "ZXhhbXBsZUFL")
+    os.Setenv("SK", "ExampleSK")
+    err = util.ReadTokenFromEnvironment()
+    Expected = "decode sk failed"
+    assert.EqualError(t, err, Expected)
+}
+
+func TestGetAppInstanceIdDecodeFailed(t *testing.T){
+    os.Setenv("APPINSTID", "b1fe5b4d-76a7-4a52-b60f-932fde7c8d57")
+    _, err := util.GetAppInstanceId()
+    Expected := "decode app instanceid failed"
+    assert.EqualError(t, err, Expected)
+}
+
+func TestGetAppInstanceIdNotSet(t *testing.T){
+    _, err := util.GetAppInstanceId()
+    Expected := "APPINSTID should be set in env variable"
     assert.EqualError(t, err, Expected)
 }

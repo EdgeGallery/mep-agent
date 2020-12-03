@@ -25,6 +25,5 @@ type ErrorController struct {
 // Error handling for invalid request
 func (c *ErrorController) Error404() {
 	c.Data["content"] = "page not found"
-	c.Ctx.ResponseWriter.WriteHeader(404)
-	c.ServeJSON()
+	c.TplName = "error/404.tpl"
 }
