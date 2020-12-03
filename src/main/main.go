@@ -36,19 +36,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// validate ACCESS_KEY and SECRET_KEY with nil, length and regex
-	if util.AppConfig["ACCESS_KEY"] == nil || len(*util.AppConfig["ACCESS_KEY"]) == 0 {
-		log.Info("The input param of ak is invalid")
-		util.ClearMap()
-		os.Exit(1)
-	}
-
-	if util.AppConfig["SECRET_KEY"] == nil || len(*util.AppConfig["SECRET_KEY"]) == 0 {
-		log.Info("The input param of sk is invalid")
-		util.ClearMap()
-		os.Exit(1)
-	}
-
 	if err := util.ValidateAkSk(string(*util.AppConfig["ACCESS_KEY"]), util.AppConfig["SECRET_KEY"]); err != nil {
 		log.Info("the input param of ak or sk do not pass the validation")
 		util.ClearMap()
