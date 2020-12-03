@@ -41,7 +41,6 @@ var cipherSuiteMap = map[string]uint16{
 
 // get yaml and parse to AppInstanceInfo object
 func GetAppInstanceConf(path string) (model.AppInstanceInfo, error) {
-	log.Info("begin to parse the app_instance_info.yaml")
 	yamlFile, err := ioutil.ReadFile(path)
 	var info model.AppInstanceInfo
 	if err != nil {
@@ -55,7 +54,6 @@ func GetAppInstanceConf(path string) (model.AppInstanceInfo, error) {
 }
 
 func getAPPConf(path string) (model.AppConfInfo, error) {
-	log.Info("begin to parse the app_conf.yaml")
 	yamlFile, err := ioutil.ReadFile(path)
 	var info model.AppConfInfo
 	if err != nil {
@@ -88,7 +86,6 @@ func PostRegisterRequest(registerData RegisterData) (string, error) {
 	if err2 != nil {
 		return "", err2
 	}
-	log.Info("response is received")
 
 	if response.StatusCode != http.StatusCreated {
 		return "", errors.New("created failed, status is " + strconv.Itoa(response.StatusCode))

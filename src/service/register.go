@@ -76,12 +76,12 @@ func RegisterToMep(conf model.AppInstanceInfo, wg *sync.WaitGroup) ([]model.Serv
 		var registerData = RegisterData{data: string(data), url: url, token: &util.MepToken}
 		resBody, errPostRequest := PostRegisterRequest(registerData)
 		if errPostRequest != nil {
-			log.Error("Failed to register to mep, appInstanceId is " + appInstanceId +
+			log.Error("failed to register to mep, appInstanceId is " + appInstanceId +
 				", serviceName is " + serviceInfo.SerName)
 			wg.Add(1)
 			go retryRegister(registerData, appInstanceId, serviceInfo, wg)
 		} else {
-			log.Info("Register to mep success, appInstanceId is " + appInstanceId +
+			log.Info("register to mep success, appInstanceId is " + appInstanceId +
 				", serviceName is " + serviceInfo.SerName)
 			_, errPostRequest = storeRegisterData(resBody)
 			if errPostRequest != nil {
@@ -91,7 +91,7 @@ func RegisterToMep(conf model.AppInstanceInfo, wg *sync.WaitGroup) ([]model.Serv
 		}
 
 	}
-	log.Info("services Register to mep count", len(dataStore))
+	log.Info("services registered to mep count ", len(dataStore))
 	return dataStore, nil
 }
 

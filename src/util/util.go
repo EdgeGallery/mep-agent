@@ -18,6 +18,7 @@
 package util
 
 import (
+	"encoding/base64"
 	"errors"
 	log "github.com/sirupsen/logrus"
 	"mep-agent/src/model"
@@ -64,29 +65,49 @@ func ClearMap(){
 
 //read and clearing the variable from the environment
 func ReadTokenFromEnvironment() error {
+	//clean the environment
+	defer os.Unsetenv("AK")
+	defer os.Unsetenv("SK")
+
 	if len(os.Getenv("AK")) == 0 || len(os.Getenv("SK")) == 0 {
-		err := errors.New("AK and SK keys should be set in env variable")
+		err := errors.New("ak and sk keys should be set in env variable")
 		log.Error("Keys should not be empty")
 		return err
 	}
-	AK := []byte(os.Getenv("AK"))
-	AppConfig["ACCESS_KEY"] = &AK
-	SK := []byte(os.Getenv("SK"))
-	AppConfig["SECRET_KEY"] = &SK
+	ak, decErr := base64.StdEncoding.DecodeString(os.Getenv("AK"))
+	if decErr != nil {
+		log.Error("decode ak failed")
+		err := errors.New("decode ak failed")
+		return err
+	}
 
-	//clean the environment
-	os.Unsetenv("AK")
-	os.Unsetenv("SK")
+	AppConfig["ACCESS_KEY"] = &ak
+	sk , decErr := base64.StdEncoding.DecodeString(os.Getenv("SK"))
+	if decErr != nil {
+		log.Error("decode sk failed")
+		err := errors.New("decode sk failed")
+		return err
+	}
+	AppConfig["SECRET_KEY"] = &sk
 	return nil
 }
 
 //Read application instanceId
 func GetAppInstanceId() (string, error) {
+	defer os.Unsetenv("APPINSTID")
 	if len(os.Getenv("APPINSTID")) == 0  {
 		err := errors.New("APPINSTID should be set in env variable")
 		log.Error("AppInstanceId must be set")
 		return "", err
 	}
-	AppInstanceId = os.Getenv("APPINSTID")
+
+	instId, decErr := base64.StdEncoding.DecodeString(os.Getenv("APPINSTID"))
+	if decErr != nil {
+		log.Error("decode app instanceid failed")
+		err := errors.New("decode app instanceid failed")
+		return "", err
+	}
+
+	AppInstanceId = string(instId)
 	return AppInstanceId, nil
 }
