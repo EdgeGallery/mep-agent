@@ -34,7 +34,8 @@ const (
 	MEP_AUTH_APIGW_URL         string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mepauth/mepauth/v1/token"
 	MEP_SER_REGISTER_APIGW_URL string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mepserver/mec_service_mgmt/v1/applications/${appInstanceId}/services"
 	MEP_HEART_BEAT_APIGW_URL   string = "https://${MEP_IP}:${MEP_APIGW_PORT}"
-
+	MEP_IP                     string = "${MEP_IP}"
+	MEP_APIGW_PORT             string = "${MEP_APIGW_PORT}"
 )
 
 // Returns server URL
@@ -52,15 +53,16 @@ func GetServerUrl() (ServerUrl, error) {
 	}
 
 	serverUrl.MepServerRegisterUrl = strings.Replace(
-		strings.Replace(MEP_SER_REGISTER_APIGW_URL, "${MEP_IP}", mepIp, 1),
-		"${MEP_APIGW_PORT}", mepApiGwPort, 1)
+		strings.Replace(MEP_SER_REGISTER_APIGW_URL, MEP_IP, mepIp, 1),
+		MEP_APIGW_PORT, mepApiGwPort, 1)
 
 	serverUrl.MepAuthUrl = strings.Replace(
-		strings.Replace(MEP_AUTH_APIGW_URL, "${MEP_IP}", mepIp, 1),
-		"${MEP_APIGW_PORT}", mepApiGwPort, 1)
+		strings.Replace(MEP_AUTH_APIGW_URL, MEP_IP, mepIp, 1),
+		MEP_APIGW_PORT, mepApiGwPort, 1)
 
 	serverUrl.MepHeartBeatUrl = strings.Replace(
-		strings.Replace(MEP_HEART_BEAT_APIGW_URL, "${MEP_IP}", mepIp, 1),
-		"${MEP_APIGW_PORT}", mepApiGwPort, 1)
+		strings.Replace(MEP_HEART_BEAT_APIGW_URL, MEP_IP, mepIp, 1),
+		MEP_APIGW_PORT, mepApiGwPort, 1)
+
 	return serverUrl, nil
 }
