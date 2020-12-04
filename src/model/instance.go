@@ -60,15 +60,20 @@ type TransportInfo struct {
 	TransportType    TransportType    `yaml:"type" json:"type"`
 	Protocol         string           `yaml:"protocol" json:"protocol"`
 	Version          string           `yaml:"version" json:"version"`
-	Endpoint         EndPointInfoUris `yaml:"endpoint" json:"endpoint"`
+	Endpoint         EndPointInfo     `yaml:"endpoint" json:"endpoint"`
 	Security         SecurityInfo     `yaml:"security" json:"security"`
 	ImplSpecificInfo ImplSpecificInfo `yaml:"implSpecificInfo" json:"implSpecificInfo"`
 }
 
 type TransportType string
 
-type EndPointInfoUris struct {
-	Uris []string `yaml:"uris" json:"uris"`
+type EndPointInfo struct {
+	Addresses   []EndPointInfoAddress `yaml:"addresses" json:"addresses"`
+}
+
+type EndPointInfoAddress struct {
+	Host string `yaml:"host" json:"host"`
+	Port uint32 `yaml:"port" json:"port"`
 }
 
 type SecurityInfo struct {

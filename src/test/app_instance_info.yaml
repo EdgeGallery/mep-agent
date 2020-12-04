@@ -16,8 +16,9 @@ serviceInfoPosts:
       protocol: http
       version: '2.0'
       endpoint:
-        uris:
-          - http://sampleapp.default:32115
+        addresses:
+          - host: sampleapp.default
+            port: 32115
     serializer: JSON
     scopeOfLocality: MEC_SYSTEM
     consumedLocalOnly: false
