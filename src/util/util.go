@@ -18,7 +18,6 @@
 package util
 
 import (
-	"encoding/base64"
 	"errors"
 	log "github.com/sirupsen/logrus"
 	"mep-agent/src/model"
@@ -42,11 +41,17 @@ var FirstToken = false
 var AppInstanceId string
 
 //Refresh token timer
-var RefresTimer *time.Timer
+var RefreshTimer *time.Timer
 
 //Timer buffer 5 sec
 const RefreshTimeBuffer = 5
 
+const (
+	AK        string = "AK"
+	SK        string = "SK"
+	APPINSTID string = "APPINSTID"
+
+)
 // Clears byte array
 func ClearByteArray(data []byte) {
 	if data == nil {
@@ -67,28 +72,17 @@ func ClearMap() {
 //read and clearing the variable from the environment
 func ReadTokenFromEnvironment() error {
 	//clean the environment
-	defer os.Unsetenv("AK")
-	defer os.Unsetenv("SK")
+	defer os.Unsetenv(AK)
+	defer os.Unsetenv(SK)
 
-	if len(os.Getenv("AK")) == 0 || len(os.Getenv("SK")) == 0 {
+	if len(os.Getenv(AK)) == 0 || len(os.Getenv(SK)) == 0 {
 		err := errors.New("ak and sk keys should be set in env variable")
 		log.Error("Keys should not be empty")
 		return err
 	}
-	ak := []byte(os.Getenv("AK"))
-	/*	if decErr != nil {
-		log.Error("decode ak failed")
-		err := errors.New("decode ak failed")
-		return err
-	}*/
-
+	ak := []byte(os.Getenv(AK))
 	AppConfig["ACCESS_KEY"] = &ak
-	sk := []byte(os.Getenv("SK"))
-	/*	if decErr != nil {
-		log.Error("decode sk failed")
-		err := errors.New("decode sk failed")
-		return err
-	}*/
+	sk := []byte(os.Getenv(SK))
 	AppConfig["SECRET_KEY"] = &sk
 	log.Infof("Ak: %s, Sk: %s.", ak, sk)
 	return nil
@@ -96,20 +90,14 @@ func ReadTokenFromEnvironment() error {
 
 //Read application instanceId
 func GetAppInstanceId() (string, error) {
-	defer os.Unsetenv("APPINSTID")
-	if len(os.Getenv("APPINSTID")) == 0 {
-		err := errors.New("APPINSTID should be set in env variable")
-		log.Error("AppInstanceId must be set")
+	defer os.Unsetenv(APPINSTID)
+	if len(os.Getenv(APPINSTID)) == 0 {
+		err := errors.New("appInstanceId should be set in env variable")
+		log.Error("appInstanceId must be set")
 		return "", err
 	}
 
-	instId, decErr := base64.StdEncoding.DecodeString(os.Getenv("APPINSTID"))
-	if decErr != nil {
-		log.Error("decode app instanceid failed")
-		err := errors.New("decode app instanceid failed")
-		return "", err
-	}
-
-	AppInstanceId = string(instId)
+	instId := os.Getenv(APPINSTID)
+	AppInstanceId = instId
 	return AppInstanceId, nil
 }

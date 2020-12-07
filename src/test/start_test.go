@@ -17,6 +17,7 @@
 package test
 
 import (
+	"errors"
 	"github.com/agiledragon/gomonkey"
 	"github.com/smartystreets/goconvey/convey"
 	"mep-agent/src/model"
@@ -33,14 +34,11 @@ func TestStartSuccess(t *testing.T) {
 		var dataStore []model.ServiceInfoPost
 		data := model.ServiceInfoPost{LivenessInterval : 1}
 		dataStore = append(dataStore,data)
-		patch1 := gomonkey.ApplyFunc(service.GetAppInstanceConf, func(path string) (model.AppInstanceInfo, error) {
-			return model.AppInstanceInfo{}, nil
-		})
-		patch2 := gomonkey.ApplyFunc(service.GetMepToken, func(auth model.Auth) (error) {
+		patch2 := gomonkey.ApplyFunc(service.GetMepToken, func(model.Auth) (error) {
 			return nil
 		})
-		patch3 := gomonkey.ApplyFunc(service.RegisterToMep, func(conf model.AppInstanceInfo,
-			                                                     wg *sync.WaitGroup)([]model.ServiceInfoPost, error) {
+		patch3 := gomonkey.ApplyFunc(service.RegisterToMep, func(model.AppInstanceInfo,
+			                                                     *sync.WaitGroup)([]model.ServiceInfoPost, error) {
 			return dataStore, nil
 		})
 
@@ -50,7 +48,40 @@ func TestStartSuccess(t *testing.T) {
 		util.AppConfig["SECRET_KEY"] = &SK
 
 
-		service.BeginService().Start("../../conf/app_instance_info.yaml")
+		service.BeginService().Start("app_instance_info.yaml")
+		defer patch2.Reset()
+		defer patch3.Reset()
+	})
+
+
+}
+
+
+// Tests start service
+func TestStartFail(t *testing.T) {
+
+	convey.Convey("Start", t, func() {
+		var dataStore []model.ServiceInfoPost
+		data := model.ServiceInfoPost{LivenessInterval : 1}
+		dataStore = append(dataStore,data)
+		patch1 := gomonkey.ApplyFunc(service.GetAppInstanceConf, func(string) (model.AppInstanceInfo, error) {
+			return model.AppInstanceInfo{}, nil
+		})
+		patch2 := gomonkey.ApplyFunc(service.GetMepToken, func(model.Auth) (error) {
+			return nil
+		})
+		patch3 := gomonkey.ApplyFunc(service.RegisterToMep, func(model.AppInstanceInfo,
+			*sync.WaitGroup)([]model.ServiceInfoPost, error) {
+			return dataStore, errors.New("Some error")
+		})
+
+		AK := []byte("accessKey")
+		util.AppConfig["ACCESS_KEY"] = &AK
+		SK := []byte("secretKey")
+		util.AppConfig["SECRET_KEY"] = &SK
+
+
+		service.BeginService().Start("./mep-agent/test/app_instance_info.yaml")
 
 		defer patch1.Reset()
 		defer patch2.Reset()

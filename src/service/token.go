@@ -64,8 +64,8 @@ func startRefreshTimer() {
 			log.Error("panic handled:", err1)
 		}
 	}()
-	if util.RefresTimer != nil {
-		ok := util.RefresTimer.Stop()
+	if util.RefreshTimer != nil {
+		ok := util.RefreshTimer.Stop()
 		if ok {
 			log.Info("timer stopped")
 		} else {
@@ -73,10 +73,10 @@ func startRefreshTimer() {
 		}
 	}
 	//start timer with latest token expiry value - buffertime
-	util.RefresTimer = time.NewTimer(time.Duration(util.MepToken.ExpiresIn - util.RefreshTimeBuffer) * time.Second)
+	util.RefreshTimer = time.NewTimer(time.Duration(util.MepToken.ExpiresIn - util.RefreshTimeBuffer) * time.Second)
 	log.Info("Refresh timer started")
 	go func() {
-		_, ok := <-util.RefresTimer.C
+		_, ok := <-util.RefreshTimer.C
 		if !ok {
 			log.Error("Timer C channel closed")
 		}
