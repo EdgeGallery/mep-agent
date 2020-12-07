@@ -49,29 +49,15 @@ func TestReadTokenFromEnvironment2(t *testing.T) {
 	assert.EqualError(t, err, Expected)
 }
 
-/*func TestReadTokenFromEnvironmentDecodeFailed(t *testing.T){
-    os.Setenv("AK", "ExampleAK")
-    os.Setenv("SK", "ExampleSK")
-    err := util.ReadTokenFromEnvironment()
-    Expected := "decode ak failed"
-    assert.EqualError(t, err, Expected)
-
-    os.Setenv("AK", "ZXhhbXBsZUFL")
-    os.Setenv("SK", "ExampleSK")
-    err = util.ReadTokenFromEnvironment()
-    Expected = "decode sk failed"
-    assert.EqualError(t, err, Expected)
-}*/
 
 func TestGetAppInstanceIdDecodeFailed(t *testing.T) {
 	os.Setenv("APPINSTID", "b1fe5b4d-76a7-4a52-b60f-932fde7c8d57")
 	_, err := util.GetAppInstanceId()
-	Expected := "decode app instanceid failed"
-	assert.EqualError(t, err, Expected)
+	assert.Equal(t, err, nil)
 }
 
 func TestGetAppInstanceIdNotSet(t *testing.T) {
 	_, err := util.GetAppInstanceId()
-	Expected := "APPINSTID should be set in env variable"
+	Expected := "appInstanceId should be set in env variable"
 	assert.EqualError(t, err, Expected)
 }

@@ -44,7 +44,7 @@ func GetServerUrl() (ServerUrl, error) {
 	var serverUrl ServerUrl
 	// validate the env params
 	mepIp := os.Getenv("MEP_IP")
-	if util.ValidateIp(mepIp) != nil {
+	if util.ValidateDns(mepIp) != nil {
 		return serverUrl, errors.New("validate MEP_IP failed")
 	}
 	mepApiGwPort := os.Getenv("MEP_APIGW_PORT")
