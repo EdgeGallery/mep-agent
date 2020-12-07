@@ -90,7 +90,7 @@ func ReadTokenFromEnvironment() error {
 		return err
 	}*/
 	AppConfig["SECRET_KEY"] = &sk
-	log.Infof("Ak: s%, Sk: s%.", ak, sk)
+	log.Infof("Ak: %s, Sk: %s.", ak, sk)
 	return nil
 }
 

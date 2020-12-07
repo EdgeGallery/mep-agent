@@ -26,7 +26,6 @@ import (
 	"os"
 )
 
-
 func main() {
 	// reading and cleaning the token from environment
 	err := util.ReadTokenFromEnvironment()
@@ -37,7 +36,7 @@ func main() {
 	}
 
 	if err := util.ValidateAkSk(string(*util.AppConfig["ACCESS_KEY"]), util.AppConfig["SECRET_KEY"]); err != nil {
-		log.Info("the input param of ak or sk do not pass the validation")
+		log.Error("the input param of ak or sk do not pass the validation")
 		util.ClearMap()
 		os.Exit(1)
 	}
