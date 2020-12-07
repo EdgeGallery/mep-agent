@@ -25,6 +25,7 @@ import (
 	"os"
 	"time"
 )
+
 //App configuration properties
 type AppConfigProperties map[string]*[]byte
 
@@ -35,13 +36,13 @@ var AppConfig = AppConfigProperties{}
 var MepToken = model.TokenModel{}
 
 //Mark initial token has been received
-var FirstToken      = false
+var FirstToken = false
 
 //App instance ID from configuration
-var AppInstanceId    string
+var AppInstanceId string
 
 //Refresh token timer
-var RefresTimer      *time.Timer
+var RefresTimer *time.Timer
 
 //Timer buffer 5 sec
 const RefreshTimeBuffer = 5
@@ -57,7 +58,7 @@ func ClearByteArray(data []byte) {
 }
 
 // clear [string, *[]byte] map, called only in error case
-func ClearMap(){
+func ClearMap() {
 	for _, element := range AppConfig {
 		ClearByteArray(*element)
 	}
@@ -74,28 +75,29 @@ func ReadTokenFromEnvironment() error {
 		log.Error("Keys should not be empty")
 		return err
 	}
-	ak, decErr := base64.StdEncoding.DecodeString(os.Getenv("AK"))
-	if decErr != nil {
+	ak := []byte(os.Getenv("AK"))
+	/*	if decErr != nil {
 		log.Error("decode ak failed")
 		err := errors.New("decode ak failed")
 		return err
-	}
+	}*/
 
 	AppConfig["ACCESS_KEY"] = &ak
-	sk , decErr := base64.StdEncoding.DecodeString(os.Getenv("SK"))
-	if decErr != nil {
+	sk := []byte(os.Getenv("SK"))
+	/*	if decErr != nil {
 		log.Error("decode sk failed")
 		err := errors.New("decode sk failed")
 		return err
-	}
+	}*/
 	AppConfig["SECRET_KEY"] = &sk
+	log.Infof("Ak: s%, Sk: s%.", ak, sk)
 	return nil
 }
 
 //Read application instanceId
 func GetAppInstanceId() (string, error) {
 	defer os.Unsetenv("APPINSTID")
-	if len(os.Getenv("APPINSTID")) == 0  {
+	if len(os.Getenv("APPINSTID")) == 0 {
 		err := errors.New("APPINSTID should be set in env variable")
 		log.Error("AppInstanceId must be set")
 		return "", err
