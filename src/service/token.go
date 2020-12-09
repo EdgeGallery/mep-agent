@@ -28,7 +28,7 @@ import (
 )
 
 // Request token from mep_auth
-func GetMepToken(auth model.Auth) (error) {
+func GetMepToken(auth model.Auth) error {
 	// get request url
 	server, errGetServer := config.GetServerUrl()
 	if errGetServer != nil {
@@ -37,6 +37,7 @@ func GetMepToken(auth model.Auth) (error) {
 
 	// construct http request and send
 	resp, errPostRequest := PostTokenRequest("", server.MepAuthUrl, auth)
+	log.Infof("GetMepToken response: %s", resp)
 	if errPostRequest != nil {
 		return errPostRequest
 	}
@@ -73,7 +74,7 @@ func startRefreshTimer() {
 		}
 	}
 	//start timer with latest token expiry value - buffertime
-	util.RefreshTimer = time.NewTimer(time.Duration(util.MepToken.ExpiresIn - util.RefreshTimeBuffer) * time.Second)
+	util.RefreshTimer = time.NewTimer(time.Duration(util.MepToken.ExpiresIn-util.RefreshTimeBuffer) * time.Second)
 	log.Info("Refresh timer started")
 	go func() {
 		_, ok := <-util.RefreshTimer.C
@@ -88,4 +89,3 @@ func startRefreshTimer() {
 		}
 	}()
 }
-
