@@ -96,7 +96,7 @@ func PostRegisterRequest(registerData RegisterData) (string, error) {
 
 // get token from mep
 func PostTokenRequest(param string, url string, auth model.Auth) (string, error) {
-	log.Infof("PostTokenRequest param: %s, url: %s, auth: %s", param, url, auth)
+	log.Infof("PostTokenRequest param: %s, url: %s, ak: %s", param, url, auth.AccessKey)
 	// construct http request
 	req, errNewRequest := http.NewRequest("POST", url, strings.NewReader(param))
 	if errNewRequest != nil {
