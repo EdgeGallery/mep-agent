@@ -131,10 +131,10 @@ func PostTokenRequest(param string, url string, auth model.Auth) (string, error)
 	}
 
 	if response.StatusCode != http.StatusOK {
-		log.Errorf("response: %s", response)
+		log.Errorf("response status: %s, body: %s", response.Status, string(body))
 		return "", errors.New("request failed, status is " + strconv.Itoa(response.StatusCode))
 	}
-	log.Infof("response: %s", response)
+	log.Infof("response status: %s, body: %s", response.Status, string(body))
 	return string(body), nil
 }
 
