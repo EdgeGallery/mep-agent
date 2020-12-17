@@ -50,8 +50,8 @@ const (
 	AK        string = "AK"
 	SK        string = "SK"
 	APPINSTID string = "APPINSTID"
-
 )
+
 // Clears byte array
 func ClearByteArray(data []byte) {
 	if data == nil {
@@ -84,7 +84,7 @@ func ReadTokenFromEnvironment() error {
 	AppConfig["ACCESS_KEY"] = &ak
 	sk := []byte(os.Getenv(SK))
 	AppConfig["SECRET_KEY"] = &sk
-	log.Infof("Ak: %s, Sk: %s.", ak, sk)
+	log.Infof("Ak: %s", ak)
 	return nil
 }
 
