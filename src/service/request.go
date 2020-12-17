@@ -96,6 +96,7 @@ func PostRegisterRequest(registerData RegisterData) (string, error) {
 
 // get token from mep
 func PostTokenRequest(param string, url string, auth model.Auth) (string, error) {
+	log.Infof("PostTokenRequest param: %s, url: %s, auth: %s", param, url, auth)
 	// construct http request
 	req, errNewRequest := http.NewRequest("POST", url, strings.NewReader(param))
 	if errNewRequest != nil {
@@ -130,9 +131,10 @@ func PostTokenRequest(param string, url string, auth model.Auth) (string, error)
 	}
 
 	if response.StatusCode != http.StatusOK {
+		log.Errorf("response: %s", response)
 		return "", errors.New("request failed, status is " + strconv.Itoa(response.StatusCode))
 	}
-
+	log.Infof("response: %s", response)
 	return string(body), nil
 }
 
@@ -172,9 +174,9 @@ func TlsConfig() (*tls.Config, error) {
 		return nil, errors.New("Domain name validation failed")
 	}
 	return &tls.Config{
-		ServerName:   domainName,
-		MinVersion:   tls.VersionTLS12,
-		CipherSuites: cipherSuites,
+		ServerName:         domainName,
+		MinVersion:         tls.VersionTLS12,
+		CipherSuites:       cipherSuites,
 		InsecureSkipVerify: true,
 	}, nil
 }
@@ -218,9 +220,9 @@ func SendHeartBeatRequest(heartBeatData HeartBeatData) (string, error) {
 	if err2 != nil {
 		return "", err2
 	}
-	if response.StatusCode == http.StatusOK || response.StatusCode == http.StatusNoContent{
+	if response.StatusCode == http.StatusOK || response.StatusCode == http.StatusNoContent {
 		return string(body), nil
-	} else  {
+	} else {
 		return "", errors.New("heartbeat request failed, status is " + strconv.Itoa(response.StatusCode))
 	}
 }
