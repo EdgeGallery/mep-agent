@@ -19,6 +19,7 @@ package config
 
 import (
 	"errors"
+	log "github.com/sirupsen/logrus"
 	"mep-agent/src/util"
 	"os"
 	"strings"
@@ -63,6 +64,7 @@ func GetServerUrl() (ServerUrl, error) {
 	serverUrl.MepHeartBeatUrl = strings.Replace(
 		strings.Replace(MEP_HEART_BEAT_APIGW_URL, MEP_IP, mepIp, 1),
 		MEP_APIGW_PORT, mepApiGwPort, 1)
-
+	log.Infof("MepAuthUrl: %s, MepHeartBeatUrl: %s, MepServerRegisterUrl: %s", serverUrl.MepAuthUrl,
+		serverUrl.MepHeartBeatUrl, serverUrl.MepServerRegisterUrl)
 	return serverUrl, nil
 }

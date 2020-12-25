@@ -134,7 +134,7 @@ func PostTokenRequest(param string, url string, auth model.Auth) (string, error)
 		log.Errorf("response status: %s, body: %s", response.Status, string(body))
 		return "", errors.New("request failed, status is " + strconv.Itoa(response.StatusCode))
 	}
-	log.Infof("response status: %s, body: %s", response.Status, string(body))
+	log.Infof("response status: %s", response.Status)
 	return string(body), nil
 }
 
