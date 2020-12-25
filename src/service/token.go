@@ -37,7 +37,6 @@ func GetMepToken(auth model.Auth) error {
 
 	// construct http request and send
 	resp, errPostRequest := PostTokenRequest("", server.MepAuthUrl, auth)
-	log.Infof("GetMepToken response: %s", resp)
 	if errPostRequest != nil {
 		return errPostRequest
 	}
