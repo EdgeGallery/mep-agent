@@ -35,6 +35,12 @@ WORKDIR $HOME
 
 RUN go build -buildmode=pie -ldflags '-linkmode "external" -extldflags "-static"' src/main/main.go
 
+RUN chmod 550 $HOME/main &&\
+    chmod -R 750 $HOME/conf &&\
+    chmod 640 $HOME/conf/app_conf.yaml &&\
+    chmod 500 -R $HOME/views &&\
+    chmod 440 -R $HOME/views/error/404.tpl
+
 FROM alpine:latest
 RUN sed -i "s|umask 022|umask 027|g" /etc/profile
 
@@ -59,20 +65,18 @@ RUN apk update &&\
 ## SETTING UP THE APP ##
 WORKDIR $HOME
 
-# Copy in the application exe.
-COPY --from=builder $HOME/main $HOME/bin
-COPY --from=builder $HOME/conf/ $HOME/conf/
-COPY --from=builder $HOME/views/ $HOME/views/
-
 # Create log and cert directory
 RUN chmod 750 $HOME &&\
-    chmod 750 $HOME/conf &&\
     chmod 550 -R $HOME/bin &&\
-    chmod 640 $HOME/conf/app_conf.yaml &&\
-    chmod 500 -R $HOME/views &&\
-    chmod 440 -R $HOME/views/error/404.tpl &&\
-    mkdir -p -m 750 /usr/mep/log &&\
+    mkdir -p -m 750 $HOME/log &&\
+    mkdir -p -m 750 $HOME/conf &&\
+    mkdir -p -m 500 $HOME/views &&\
     chown -hR $USER_NAME:$GROUP_NAME $HOME
+
+# Copy in the application exe.
+COPY --from=builder --chown=$USER_NAME:$GROUP_NAME $HOME/main $HOME/bin
+COPY --from=builder --chown=$USER_NAME:$GROUP_NAME $HOME/conf/ $HOME/conf/
+COPY --from=builder --chown=$USER_NAME:$GROUP_NAME $HOME/views/ $HOME/views/
 
 # Change to the app user.
 USER $USER_NAME
