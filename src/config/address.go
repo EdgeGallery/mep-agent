@@ -34,9 +34,9 @@ type ServerUrl struct {
 }
 
 const (
-	MEP_AUTH_APIGW_URL              string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mepauth/mepauth/v1/token"
-	MEP_SER_REGISTER_APIGW_URL      string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mepserver/mec_service_mgmt/v1/applications/${appInstanceId}/services"
-	MEP_SER_QUERY_BY_NAME_APIGW_URL string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mepserver/mec_service_mgmt/v1/services?ser_name="
+	MEP_AUTH_APIGW_URL              string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/token"
+	MEP_SER_REGISTER_APIGW_URL      string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/mec_service_mgmt/v1/applications/${appInstanceId}/services"
+	MEP_SER_QUERY_BY_NAME_APIGW_URL string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/mec_service_mgmt/v1/services?ser_name="
 	MEP_HEART_BEAT_APIGW_URL        string = "https://${MEP_IP}:${MEP_APIGW_PORT}"
 	MEP_IP                          string = "${MEP_IP}"
 	MEP_APIGW_PORT                  string = "${MEP_APIGW_PORT}"
