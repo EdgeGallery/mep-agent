@@ -19,24 +19,27 @@ package config
 
 import (
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"mep-agent/src/util"
 	"os"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type ServerUrl struct {
-	MepServerRegisterUrl string
-	MepAuthUrl           string
-	MepHeartBeatUrl      string
+	MepServerRegisterUrl   string
+	MepAuthUrl             string
+	MepHeartBeatUrl        string
+	MepServiceDiscoveryUrl string
 }
 
 const (
-	MEP_AUTH_APIGW_URL         string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mepauth/mepauth/v1/token"
-	MEP_SER_REGISTER_APIGW_URL string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mepserver/mec_service_mgmt/v1/applications/${appInstanceId}/services"
-	MEP_HEART_BEAT_APIGW_URL   string = "https://${MEP_IP}:${MEP_APIGW_PORT}"
-	MEP_IP                     string = "${MEP_IP}"
-	MEP_APIGW_PORT             string = "${MEP_APIGW_PORT}"
+	MEP_AUTH_APIGW_URL              string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mepauth/mepauth/v1/token"
+	MEP_SER_REGISTER_APIGW_URL      string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mepserver/mec_service_mgmt/v1/applications/${appInstanceId}/services"
+	MEP_SER_QUERY_BY_NAME_APIGW_URL string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mepserver/mec_service_mgmt/v1/services?ser_name="
+	MEP_HEART_BEAT_APIGW_URL        string = "https://${MEP_IP}:${MEP_APIGW_PORT}"
+	MEP_IP                          string = "${MEP_IP}"
+	MEP_APIGW_PORT                  string = "${MEP_APIGW_PORT}"
 )
 
 // Returns server URL
@@ -64,7 +67,11 @@ func GetServerUrl() (ServerUrl, error) {
 	serverUrl.MepHeartBeatUrl = strings.Replace(
 		strings.Replace(MEP_HEART_BEAT_APIGW_URL, MEP_IP, mepIp, 1),
 		MEP_APIGW_PORT, mepApiGwPort, 1)
-	log.Infof("MepAuthUrl: %s, MepHeartBeatUrl: %s, MepServerRegisterUrl: %s", serverUrl.MepAuthUrl,
-		serverUrl.MepHeartBeatUrl, serverUrl.MepServerRegisterUrl)
+
+	serverUrl.MepServiceDiscoveryUrl = strings.Replace(
+		strings.Replace(MEP_SER_QUERY_BY_NAME_APIGW_URL, MEP_IP, mepIp, 1),
+		MEP_APIGW_PORT, mepApiGwPort, 1)
+	log.Infof("MepAuthUrl: %s, MepHeartBeatUrl: %s, MepServerRegisterUrl: %s, MepServiceDiscoveryUrl: %s",
+		serverUrl.MepAuthUrl, serverUrl.MepHeartBeatUrl, serverUrl.MepServerRegisterUrl, serverUrl.MepServiceDiscoveryUrl)
 	return serverUrl, nil
 }
