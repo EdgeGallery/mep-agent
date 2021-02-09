@@ -23,5 +23,6 @@ import (
 
 func init() {
 	beego.Router("/mep-agent/v1/token", &controllers.TokenController{})
+	beego.Router("/mep-agent/v1/endpoint/:serName", &controllers.EndpointController{})
 }
 

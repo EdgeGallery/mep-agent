@@ -33,6 +33,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type RequestData struct {
+	Token *model.TokenModel
+	Data  string
+	Url   string
+}
+
 // const
 var cipherSuiteMap = map[string]uint16{
 	"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256": tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
@@ -209,6 +215,31 @@ func SendHeartBeatRequest(heartBeatData HeartBeatData) (string, error) {
 		return "", errNewRequest
 	}
 	req.Header.Set("Authorization", heartBeatData.token.TokenType+" "+heartBeatData.token.AccessToken)
+
+	response, errDo := DoRequest(req)
+	if errDo != nil {
+		return "", errDo
+	}
+
+	defer response.Body.Close()
+	body, err2 := ioutil.ReadAll(response.Body)
+	if err2 != nil {
+		return "", err2
+	}
+	if response.StatusCode == http.StatusOK || response.StatusCode == http.StatusNoContent {
+		return string(body), nil
+	} else {
+		return "", errors.New("heartbeat request failed, status is " + strconv.Itoa(response.StatusCode))
+	}
+}
+
+// Query endpoint from MEP
+func SendQueryRequest(requestData RequestData) (string, error) {
+	req, errNewRequest := http.NewRequest("GET", requestData.Url, strings.NewReader(requestData.Data))
+	if errNewRequest != nil {
+		return "", errNewRequest
+	}
+	req.Header.Set("Authorization", requestData.Token.TokenType+" "+requestData.Token.AccessToken)
 
 	response, errDo := DoRequest(req)
 	if errDo != nil {
