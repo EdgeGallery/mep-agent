@@ -79,8 +79,8 @@ func (c *EndpointController) Get() {
 		c.Ctx.ResponseWriter.WriteHeader(400)
 	} else {
 		transportInfo := resBodyMap[0].TransportInfo
+		log.Info("transportInfo: ", transportInfo)
 		c.Data["json"] = transportInfo.Endpoint
-		c.Ctx.ResponseWriter.ResponseWriter.Header().Set("Content-Type", "application/json; charset=utf-8")
 		c.Ctx.ResponseWriter.WriteHeader(200)
 	}
 	c.ServeJSON()
