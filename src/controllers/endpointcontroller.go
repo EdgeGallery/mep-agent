@@ -74,16 +74,13 @@ func (c *EndpointController) Get() {
 	var resBodyMap []Service
 	log.Info("resBodyMap: ", resBody)
 	err := json.Unmarshal([]byte(resBody), &resBodyMap)
-	log.Info("resBodyMap: ", resBodyMap)
 	if err != nil {
 		log.Error("Unmarshal failed")
 		c.Data["json"] = "Service does not exist."
 		c.Ctx.ResponseWriter.WriteHeader(400)
 	} else {
 		transportInfo := resBodyMap[0].TransportInfo
-		log.Info("transportInfo: ", transportInfo.Id)
 		log.Info("Endpoint: ", transportInfo.Endpoint)
-		log.Info("uir: ", transportInfo.Endpoint.Uris[0])
 		c.Data["json"] = transportInfo.Endpoint
 		c.Ctx.ResponseWriter.WriteHeader(200)
 	}

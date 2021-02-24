@@ -22,8 +22,6 @@ import (
 	"mep-agent/src/util"
 	"os"
 	"strings"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type ServerUrl struct {
@@ -71,7 +69,5 @@ func GetServerUrl() (ServerUrl, error) {
 	serverUrl.MepServiceDiscoveryUrl = strings.Replace(
 		strings.Replace(MEP_SER_QUERY_BY_NAME_APIGW_URL, MEP_IP, mepIp, 1),
 		MEP_APIGW_PORT, mepApiGwPort, 1)
-	log.Infof("MepAuthUrl: %s, MepHeartBeatUrl: %s, MepServerRegisterUrl: %s, MepServiceDiscoveryUrl: %s",
-		serverUrl.MepAuthUrl, serverUrl.MepHeartBeatUrl, serverUrl.MepServerRegisterUrl, serverUrl.MepServiceDiscoveryUrl)
 	return serverUrl, nil
 }
