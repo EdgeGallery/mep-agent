@@ -36,7 +36,7 @@ func BeginService() *Ser {
 
 // service entrance
 func (ser *Ser) Start(confPath string) {
-
+	log.Info("Start")
 	var wg = &sync.WaitGroup{}
 	// read app_instance_info.yaml file and transform to AppInstanceInfo object
 	conf, errGetConf := GetAppInstanceConf(confPath)
@@ -57,6 +57,7 @@ func (ser *Ser) Start(confPath string) {
 		return
 	}
 	util.FirstToken = true
+	return
 
 	// register service to mep with token
 	// only ServiceInfo not nil

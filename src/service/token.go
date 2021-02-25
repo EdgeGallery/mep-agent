@@ -19,16 +19,18 @@ package service
 
 import (
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
 	"mep-agent/src/config"
 	"mep-agent/src/model"
 	"mep-agent/src/util"
 	"time"
 	"unsafe"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Request token from mep_auth
 func GetMepToken(auth model.Auth) error {
+	log.Info("begin to get token from mepauth")
 	// get request url
 	server, errGetServer := config.GetServerUrl()
 	if errGetServer != nil {
@@ -50,6 +52,8 @@ func GetMepToken(auth model.Auth) error {
 		return errJson
 	}
 
+	token := *&util.MepToken.AccessToken
+	log.Infof("token: %s", token)
 	log.Info("get token success.")
 
 	//start timer to refresh token

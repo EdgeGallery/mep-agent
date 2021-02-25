@@ -123,6 +123,8 @@ func PostTokenRequest(param string, url string, auth model.Auth) (string, error)
 		return "", errSign
 	}
 	req.Header.Set("Authorization", authorization)
+	log.Infof("Authorization: %s", authorization)
+	log.Info("PostTokenRequest: ", req)
 
 	// send http request
 	response, errDo := DoRequest(req)

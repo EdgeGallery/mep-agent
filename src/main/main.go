@@ -17,13 +17,14 @@
 package main
 
 import (
-	"github.com/astaxie/beego"
-	log "github.com/sirupsen/logrus"
 	"mep-agent/src/controllers"
 	_ "mep-agent/src/router"
 	"mep-agent/src/service"
 	"mep-agent/src/util"
 	"os"
+
+	"github.com/astaxie/beego"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -42,7 +43,9 @@ func main() {
 	}
 
 	// start main service
-	go service.BeginService().Start("./conf/app_instance_info.yaml")
+	//go service.BeginService().Start("./conf/app_instance_info.yaml")
+	service.BeginService().Start("./conf/app_instance_info.yaml")
+	return
 
 	log.Info("Starting server")
 	beego.ErrorController(&controllers.ErrorController{})

@@ -1,0 +1,39 @@
+serviceInfoPosts:
+  - serName: position-service
+    serCategory:
+      href: "/example/catalogue1"
+      id: id12345
+      name: position-service
+      version: 1.0
+    version: 1.0
+    state: ACTIVE
+    transportId: Rest1
+    transportInfo:
+      id: 33b13d69-79ff-4d4f-bb61-eb7d81f59b44
+      name: REST
+      description: REST API
+      type: REST_HTTP
+      protocol: HTTP
+      version: '2.0'
+      endpoint:
+        addresses:
+          - host: position-service.default
+            port: 9997
+      implSpecificInfo: {}
+    serializer: JSON
+    scopeOfLocality: MEC_SYSTEM
+    consumedLocalOnly: false
+    isLocal: true
+    livenessInterval: 60
+serAvailabilityNotificationSubscriptions:
+  - subscriptionType: SerAvailabilityNotificationSubscription
+    callbackReference: "http://positioning-service:9997/mep-agent/v1/servicestate"
+    links:
+      self:
+        href: /mecSerMgmtApi/example
+    filteringCriteria:
+      serNames:
+        - faceRecog101
+      states:
+        - ACTIVE
+      isLocal: true
