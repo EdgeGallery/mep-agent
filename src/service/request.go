@@ -33,6 +33,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const AUTHORIZATION = "Authorization"
+
 type RequestData struct {
 	Token *model.TokenModel
 	Data  string
@@ -79,7 +81,7 @@ func PostRegisterRequest(registerData RegisterData) (string, error) {
 	if errNewRequest != nil {
 		return "", errNewRequest
 	}
-	req.Header.Set("Authorization", registerData.token.TokenType+" "+registerData.token.AccessToken)
+	req.Header.Set(AUTHORIZATION, registerData.token.TokenType+" "+registerData.token.AccessToken)
 
 	// send http request
 	response, errDo := DoRequest(req)
@@ -122,7 +124,7 @@ func PostTokenRequest(param string, url string, auth model.Auth) (string, error)
 	if errSign != nil {
 		return "", errSign
 	}
-	req.Header.Set("Authorization", authorization)
+	req.Header.Set(AUTHORIZATION, authorization)
 
 	// send http request
 	response, errDo := DoRequest(req)
@@ -214,7 +216,7 @@ func SendHeartBeatRequest(heartBeatData HeartBeatData) (string, error) {
 	if errNewRequest != nil {
 		return "", errNewRequest
 	}
-	req.Header.Set("Authorization", heartBeatData.token.TokenType+" "+heartBeatData.token.AccessToken)
+	req.Header.Set(AUTHORIZATION, heartBeatData.token.TokenType+" "+heartBeatData.token.AccessToken)
 
 	response, errDo := DoRequest(req)
 	if errDo != nil {
@@ -239,7 +241,7 @@ func SendQueryRequest(requestData RequestData) (string, error) {
 	if errNewRequest != nil {
 		return "", errNewRequest
 	}
-	req.Header.Set("Authorization", requestData.Token.TokenType+" "+requestData.Token.AccessToken)
+	req.Header.Set(AUTHORIZATION, requestData.Token.TokenType+" "+requestData.Token.AccessToken)
 
 	response, errDo := DoRequest(req)
 	if errDo != nil {
