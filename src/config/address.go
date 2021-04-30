@@ -52,7 +52,7 @@ func GetServerUrl() (ServerUrl, error) {
 		return serverUrl, errors.New("validate MEP_IP failed")
 	}
 	mepApiGwPort := os.Getenv("MEP_APIGW_PORT")
-	if len(mepApiGwPort) == 0 || util.ValidateByPattern(util.PORT_PATTERN, mepApiGwPort) != nil {
+	if util.ValidateByPattern(util.PORT_PATTERN, mepApiGwPort) != nil {
 		return serverUrl, errors.New("validate MEP_APIGW_PORT failed")
 	}
 
