@@ -22,6 +22,7 @@ type AppInstanceInfo struct {
 	SerAvailabilityNotificationSubscriptions []SerAvailabilityNotificationSubscription `yaml:"serAvailabilityNotificationSubscriptions" json:"serAvailabilityNotificationSubscriptions"`
 }
 
+// Service Information to be registered.
 type ServiceInfoPost struct {
 	SerName           string         `yaml:"serName" json:"serName"`
 	SerCategory       CategoryRef    `yaml:"serCategory" json:"serCategory"`
@@ -53,6 +54,7 @@ type CategoryRef struct {
 
 type ServiceState string
 
+// Transport Information of the service to be registered.
 type TransportInfo struct {
 	Id               string           `yaml:"id" json:"id"`
 	Name             string           `yaml:"name" json:"name"`
@@ -67,6 +69,7 @@ type TransportInfo struct {
 
 type TransportType string
 
+// Endpoint of the service to be registered.
 type EndPointInfo struct {
 	Addresses   []EndPointInfoAddress `yaml:"addresses" json:"addresses"`
 }

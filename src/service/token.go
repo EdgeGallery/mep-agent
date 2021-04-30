@@ -29,14 +29,9 @@ import (
 
 // Request token from mep_auth
 func GetMepToken(auth model.Auth) error {
-	// get request url
-	server, errGetServer := config.GetServerUrl()
-	if errGetServer != nil {
-		return errGetServer
-	}
 
 	// construct http request and send
-	resp, errPostRequest := PostTokenRequest("", server.MepAuthUrl, auth)
+	resp, errPostRequest := PostTokenRequest("", config.ServerUrlConfig.MepAuthUrl, auth)
 	if errPostRequest != nil {
 		return errPostRequest
 	}

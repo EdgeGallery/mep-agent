@@ -22,7 +22,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"mep-agent/src/config"
 	"mep-agent/src/model"
-	"time"
 	"mep-agent/src/util"
 )
 
@@ -36,11 +35,6 @@ type ServiceLivenessUpdate struct {
 	State string `json:"state"`
 }
 
-// Sleeps for an hour
-func Heart() {
-	time.Sleep(time.Hour)
-}
-
 // Send service heartbeat to MEP
 func HeartBeatRequestToMep(serviceInfo model.ServiceInfoPost) {
 
@@ -48,14 +42,10 @@ func HeartBeatRequestToMep(serviceInfo model.ServiceInfoPost) {
 	data, errJsonMarshal := json.Marshal(heartBeatRequest)
 	if errJsonMarshal != nil {
 		log.Error("Failed to marshal service info to object")
+		return
 	}
 
-	server, errGetServer := config.GetServerUrl()
-	if errGetServer != nil {
-		log.Error("Failed to get serviceUrl")
-	}
-
-	url := server.MepHeartBeatUrl + serviceInfo.Links.Self.Liveness
+	url := config.ServerUrlConfig.MepHeartBeatUrl + serviceInfo.Links.Self.Liveness
 	var heartBeatData = HeartBeatData{data: string(data), url: url, token: &util.MepToken}
 	_, errPostRequest := SendHeartBeatRequest(heartBeatData)
 	if errPostRequest != nil {

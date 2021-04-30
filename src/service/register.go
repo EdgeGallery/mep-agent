@@ -56,16 +56,12 @@ func RegisterToMep(conf model.AppInstanceInfo, wg *sync.WaitGroup) ([]model.Serv
 		return nil, errors.New("Registration of service failed, cannot contain more than " +
 			strconv.Itoa(MAX_SERVICE_COUNT) + " services in a single request")
 	}
-	server, errGetServer := config.GetServerUrl()
-	if errGetServer != nil {
-		return nil, errGetServer
-	}
 
 	if util.ValidateUUID(appInstanceId) != nil {
 		return nil, errors.New("validate appInstanceId failed")
 	}
 
-	url := strings.Replace(server.MepServerRegisterUrl, "${appInstanceId}", appInstanceId, 1)
+	url := strings.Replace(config.ServerUrlConfig.MepServerRegisterUrl, "${appInstanceId}", appInstanceId, 1)
 
 	for _, serviceInfo := range serviceInfos {
 		data, errJsonMarshal := json.Marshal(serviceInfo)

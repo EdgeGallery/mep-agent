@@ -35,6 +35,8 @@ import (
 
 const AUTHORIZATION = "Authorization"
 
+var TlsConf *tls.Config
+
 type RequestData struct {
 	Token *model.TokenModel
 	Data  string
@@ -148,14 +150,9 @@ func PostTokenRequest(param string, url string, auth model.Auth) (string, error)
 
 // do request
 func DoRequest(req *http.Request) (*http.Response, error) {
-	config, err := TlsConfig()
-	if err != nil {
-		log.Error("Unable to send request")
-		return nil, err
-	}
 
 	tr := &http.Transport{
-		TLSClientConfig: config,
+		TLSClientConfig: TlsConf,
 	}
 	client := &http.Client{Transport: tr}
 
@@ -181,6 +178,7 @@ func TlsConfig() (*tls.Config, error) {
 	if util.ValidateDomainName(domainName) != nil {
 		return nil, errors.New("Domain name validation failed")
 	}
+
 	return &tls.Config{
 		ServerName:         domainName,
 		MinVersion:         tls.VersionTLS12,
