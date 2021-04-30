@@ -54,6 +54,7 @@ func TestGetMepToken(t *testing.T) {
 		patch1 := gomonkey.ApplyFunc(config.GetServerUrl, func() (config.ServerUrl, error) {
 			return config.ServerUrl{MepAuthUrl: api}, nil
 		})
+        config.ServerUrlConfig, _ = config.GetServerUrl()
 		patch2 := gomonkey.ApplyFunc(service.TlsConfig, func() (*tls.Config, error) {
 			return nil, nil
 		})
