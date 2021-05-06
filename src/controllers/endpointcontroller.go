@@ -34,6 +34,7 @@ type Service struct {
 	TransportInfo TransportInfo `yaml:"transportInfo" json:"transportInfo"`
 }
 
+// Transport information of the service.
 type TransportInfo struct {
 	Id          string       `yaml:"id" json:"id"`
 	Name        string       `yaml:"name" json:"name"`
@@ -43,6 +44,7 @@ type TransportInfo struct {
 	Endpoint    EndPointInfo `yaml:"endpoint" json:"endpoint"`
 }
 
+// End point of the service.
 type EndPointInfo struct {
 	Uris        []string              `json:"uris" validate:"omitempty,dive,uri"`
 	Addresses   []EndPointInfoAddress `json:"addresses" validate:"omitempty,dive"`
@@ -58,12 +60,7 @@ func (c *EndpointController) Get() {
 	log.Info("received get endpoint request from app")
 	serName := c.Ctx.Input.Param(":serName")
 
-	server, errGetServer := config.GetServerUrl()
-	if errGetServer != nil {
-		log.Error("Failed to get serviceUrl")
-	}
-
-	url := server.MepServiceDiscoveryUrl + serName
+	url := config.ServerUrlConfig.MepServiceDiscoveryUrl + serName
 
 	requestData := service.RequestData{Data: "", Url: url, Token: &util.MepToken}
 	resBody, errPostRequest := service.SendQueryRequest(requestData)

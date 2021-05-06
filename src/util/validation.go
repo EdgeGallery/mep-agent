@@ -25,10 +25,10 @@ import (
 )
 
 const (
-	IP_PATTERN   string = `^[a-z][a-z-]{0,126}[a-z]$`
+	//IP_PATTERN   string = `^[a-z][a-z-]{0,126}[a-z]$`
 	PORT_PATTERN string = `^([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$`
-	AK_PATTERN   string = `^\w{20}$`
-	SK_PATTERN   string = `^\w{64}$`
+	//AK_PATTERN   string = `^\w{20}$`
+	//SK_PATTERN   string = `^\w{64}$`
 	DOMAIN_PATTERN string = `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$`
 	DNS_PATTERN string = `^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`
 	maxHostNameLen = 253
@@ -37,15 +37,20 @@ const (
 // Validates Ip address
 func ValidateDns(ip string) error {
 	ipv := net.ParseIP(ip)
+	if ipv != nil && (ipv.IsMulticast() || ipv.Equal(net.IPv4bcast)) {
+		return errors.New("invalid dns ip")
+	}
+
 	if ipv != nil {
 		return nil
 	}
+
 	return ValidateByPattern(DNS_PATTERN, ip)
 }
 
 // Validates domain name
 func ValidateDomainName(name string) error {
-	if len(name) > maxHostNameLen {
+	if len(name) == 0 || len(name) > maxHostNameLen {
 		return errors.New("validate domain name failed")
 	}
 	return ValidateByPattern(DOMAIN_PATTERN, name)
@@ -77,29 +82,3 @@ func ValidateUUID(id string) error {
 	return nil
 }
 
-// Validates SK
-func ValidateSkByPattern(pattern string, param *[]byte) error {
-	res, errMatch := regexp.Match(pattern, *param)
-	if errMatch != nil {
-		return errMatch
-	}
-	if !res {
-		return errors.New("validate failed")
-	}
-	return nil
-}
-
-// Validates AK and SK
-func ValidateAkSk(ak string, sk *[]byte) error {
-	_ = ak
-	_ = sk
-	/*
-	err := ValidateByPattern(AK_PATTERN, ak)
-	if err != nil {
-	    return err
-	}
-	err = ValidateSkByPattern(SK_PATTERN, sk)
-	return err
-	*/
-	return nil
-}

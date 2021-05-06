@@ -19,6 +19,7 @@ package main
 import (
 	"github.com/astaxie/beego"
 	log "github.com/sirupsen/logrus"
+	"mep-agent/src/config"
 	"mep-agent/src/controllers"
 	_ "mep-agent/src/router"
 	"mep-agent/src/service"
@@ -35,8 +36,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := util.ValidateAkSk(string(*util.AppConfig["ACCESS_KEY"]), util.AppConfig["SECRET_KEY"]); err != nil {
-		log.Error("the input param of ak or sk do not pass the validation")
+	service.TlsConf, err = service.TlsConfig()
+	if err != nil {
+		log.Error("Failed to set TLS Configurations")
+		util.ClearMap()
+		os.Exit(1)
+	}
+
+	config.ServerUrlConfig, err = config.GetServerUrl()
+	if err != nil {
+		log.Error("Failed to get server url Configurations")
 		util.ClearMap()
 		os.Exit(1)
 	}

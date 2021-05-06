@@ -75,29 +75,31 @@ func ReadTokenFromEnvironment() error {
 	defer os.Unsetenv(AK)
 	defer os.Unsetenv(SK)
 
-	if len(os.Getenv(AK)) == 0 || len(os.Getenv(SK)) == 0 {
+	ak := os.Getenv(AK)
+	sk := os.Getenv(SK)
+
+	if len(ak) == 0 || len(sk) == 0 {
 		err := errors.New("ak and sk keys should be set in env variable")
 		log.Error("Keys should not be empty")
 		return err
 	}
-	ak := []byte(os.Getenv(AK))
-	AppConfig["ACCESS_KEY"] = &ak
-	sk := []byte(os.Getenv(SK))
-	AppConfig["SECRET_KEY"] = &sk
-	log.Infof("Ak: %s", ak)
+	akByte := []byte(ak)
+	AppConfig["ACCESS_KEY"] = &akByte
+	skByte := []byte(sk)
+	AppConfig["SECRET_KEY"] = &skByte
+	log.Infof("Ak: %s", akByte)
 	return nil
 }
 
 //Read application instanceId
 func GetAppInstanceId() (string, error) {
 	defer os.Unsetenv(APPINSTID)
-	if len(os.Getenv(APPINSTID)) == 0 {
+	instId := os.Getenv(APPINSTID)
+	if len(instId) == 0 {
 		err := errors.New("appInstanceId should be set in env variable")
 		log.Error("appInstanceId must be set")
 		return "", err
 	}
 
-	instId := os.Getenv(APPINSTID)
-	AppInstanceId = instId
-	return AppInstanceId, nil
+	return instId, nil
 }
