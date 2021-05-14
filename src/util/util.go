@@ -100,6 +100,6 @@ func GetAppInstanceId() (string, error) {
 		log.Error("appInstanceId must be set")
 		return "", err
 	}
-
+	AppInstanceId = instId
 	return instId, nil
 }
