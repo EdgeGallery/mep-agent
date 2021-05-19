@@ -50,13 +50,13 @@ func TestRegisterToMep(t *testing.T)  {
 			}
 		}))
 
-		patch1 := gomonkey.ApplyFunc(config.GetServerUrl, func() (config.ServerUrl, error) {
-			return config.ServerUrl{MepServerRegisterUrl: ts.URL}, nil
+		patch1 := gomonkey.ApplyFunc(config.GetServerURL, func() (config.ServerURL, error) {
+			return config.ServerURL{MepServerRegisterURL: ts.URL}, nil
 		})
-		patch2 := gomonkey.ApplyFunc(service.TlsConfig, func() (*tls.Config, error) {
+		patch2 := gomonkey.ApplyFunc(service.TLSConfig, func() (*tls.Config, error) {
 			return nil, nil
 		})
-		patch3 := gomonkey.ApplyFunc(util.GetAppInstanceId, func() (string , error) {
+		patch3 := gomonkey.ApplyFunc(util.GetAppInstanceID, func() (string , error) {
 			return "", nil
 		})
 		defer ts.Close()
@@ -70,12 +70,12 @@ func TestRegisterToMep(t *testing.T)  {
 			t.Error(errGetConf.Error())
 		}
 		os.Setenv("APPINSTID", "5abe4782-2c70-4e47-9a4e-0ee3a1a0fd1f")
-		_, errAppInst := util.GetAppInstanceId()
+		_, errAppInst := util.GetAppInstanceID()
 		if errAppInst != nil {
 			t.Error(errGetConf.Error())
 		}
 		util.MepToken = model.TokenModel{AccessToken: "akakak", TokenType: "Bear", ExpiresIn: 3600}
-		util.AppInstanceId = "5abe4782-2c70-4e47-9a4e-0ee3a1a0fd1f"
+		util.AppInstanceID = "5abe4782-2c70-4e47-9a4e-0ee3a1a0fd1f"
 
 		_, errRegister := service.RegisterToMep(conf, &waitRoutineFinish)
 		if errRegister != nil {

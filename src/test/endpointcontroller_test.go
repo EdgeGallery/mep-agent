@@ -33,8 +33,8 @@ import (
 )
 
 func TestEndpointControllerGet(t *testing.T) {
-	patch1 := gomonkey.ApplyFunc(config.GetServerUrl, func() (config.ServerUrl, error) {
-		return config.ServerUrl{MepServiceDiscoveryUrl: "http://127.0.0.1:8088/mep/mec_service_mgmt/v1/services?ser_name="}, nil
+	patch1 := gomonkey.ApplyFunc(config.GetServerURL, func() (config.ServerURL, error) {
+		return config.ServerURL{MepServiceDiscoveryURL: "http://127.0.0.1:8088/mep/mec_service_mgmt/v1/services?ser_name="}, nil
 	})
 	defer patch1.Reset()
 

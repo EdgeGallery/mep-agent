@@ -51,11 +51,11 @@ func TestGetMepToken(t *testing.T) {
 		defer ts.Close()
 		api := ts.URL
 
-		patch1 := gomonkey.ApplyFunc(config.GetServerUrl, func() (config.ServerUrl, error) {
-			return config.ServerUrl{MepAuthUrl: api}, nil
+		patch1 := gomonkey.ApplyFunc(config.GetServerURL, func() (config.ServerURL, error) {
+			return config.ServerURL{MepAuthURL: api}, nil
 		})
-        config.ServerUrlConfig, _ = config.GetServerUrl()
-		patch2 := gomonkey.ApplyFunc(service.TlsConfig, func() (*tls.Config, error) {
+        config.ServerURLConfig, _ = config.GetServerURL()
+		patch2 := gomonkey.ApplyFunc(service.TLSConfig, func() (*tls.Config, error) {
 			return nil, nil
 		})
 

@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-// get token service
+// Package service get token service
 package service
 
 import (
@@ -27,28 +27,27 @@ import (
 	"unsafe"
 )
 
-// Request token from mep_auth
-func GetMepToken(auth model.Auth) error {
-
-	// construct http request and send
-	resp, errPostRequest := PostTokenRequest("", config.ServerUrlConfig.MepAuthUrl, auth)
+// GetMepToken Request token from mep_auth.
+func GetMepToken(auth model.Auth) error { // construct http request and send
+	resp, errPostRequest := postTokenRequest("", config.ServerURLConfig.MepAuthURL, auth)
 	if errPostRequest != nil {
 		return errPostRequest
 	}
 
 	// unmarshal resp to object
-	errJson := json.Unmarshal([]byte(resp), &util.MepToken)
+	errJSON := json.Unmarshal([]byte(resp), &util.MepToken)
 
 	// clear resp
 	util.ClearByteArray(*(*[]byte)(unsafe.Pointer(&resp)))
-	if errJson != nil {
-		return errJson
+	if errJSON != nil {
+		return errJSON
 	}
 
 	log.Info("get token success.")
 
-	//start timer to refresh token
+	// start timer to refresh token
 	go startRefreshTimer()
+
 	return nil
 }
 
@@ -67,7 +66,7 @@ func startRefreshTimer() {
 			log.Info("timer not yet started")
 		}
 	}
-	//start timer with latest token expiry value - buffertime
+	// start timer with latest token expiry value - buffertime
 	util.RefreshTimer = time.NewTimer(time.Duration(util.MepToken.ExpiresIn-util.RefreshTimeBuffer) * time.Second)
 	log.Info("Refresh timer started")
 	go func() {
@@ -79,6 +78,7 @@ func startRefreshTimer() {
 		errGetMepToken := GetMepToken(auth)
 		if errGetMepToken != nil {
 			log.Error("Get token failed.")
+
 			return
 		}
 	}()

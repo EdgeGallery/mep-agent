@@ -14,30 +14,32 @@
  * limitations under the License.
  */
 
+// Package controllers TokenController controller package
 package controllers
 
 import (
 	"github.com/astaxie/beego"
 	log "github.com/sirupsen/logrus"
 	"mep-agent/src/util"
+	"net/http"
 )
 
+// TokenController handles token request.
 type TokenController struct {
 	beego.Controller
 }
 
-// Get /mep-agent/v1/token function
+// Get /mep-agent/v1/token function.
 func (c *TokenController) Get() {
 	log.Info("received get token request from app")
 	if !util.FirstToken {
 		log.Error("First Token not yet received.")
-		c.Ctx.ResponseWriter.WriteHeader(412)
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusPreconditionFailed)
+
 		return
 	}
 	// Get the last token
 	c.Data["json"] = &util.MepToken
-	c.Ctx.ResponseWriter.WriteHeader(200)
+	c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 	c.ServeJSON()
 }
-
-

@@ -34,16 +34,16 @@ func TestClearByteArray(t *testing.T) {
 }
 
 func TestReadTokenFromEnvironment1(t *testing.T) {
-	os.Setenv("AK", "ZXhhbXBsZUFL")
-	os.Setenv("SK", "ZXhhbXBsZVNL")
+	os.Setenv("ak", "ZXhhbXBsZUFL")
+	os.Setenv("sk", "ZXhhbXBsZVNL")
 	err := util.ReadTokenFromEnvironment()
-	assert.EqualValues(t, 0, len(os.Getenv("AK")))
-	assert.EqualValues(t, 0, len(os.Getenv("SK")))
+	assert.EqualValues(t, 0, len(os.Getenv("ak")))
+	assert.EqualValues(t, 0, len(os.Getenv("sk")))
 	assert.NoError(t, err, "No error is expected")
 }
 
 func TestReadTokenFromEnvironment2(t *testing.T) {
-	os.Setenv("AK", "ZXhhbXBsZUFL")
+	os.Setenv("ak", "ZXhhbXBsZUFL")
 	err := util.ReadTokenFromEnvironment()
 	Expected := "ak and sk keys should be set in env variable"
 	assert.EqualError(t, err, Expected)
@@ -52,12 +52,12 @@ func TestReadTokenFromEnvironment2(t *testing.T) {
 
 func TestGetAppInstanceIdDecodeFailed(t *testing.T) {
 	os.Setenv("APPINSTID", "b1fe5b4d-76a7-4a52-b60f-932fde7c8d57")
-	_, err := util.GetAppInstanceId()
+	_, err := util.GetAppInstanceID()
 	assert.Equal(t, err, nil)
 }
 
 func TestGetAppInstanceIdNotSet(t *testing.T) {
-	_, err := util.GetAppInstanceId()
+	_, err := util.GetAppInstanceID()
 	Expected := "appInstanceId should be set in env variable"
 	assert.EqualError(t, err, Expected)
 }

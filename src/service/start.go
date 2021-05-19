@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-// start service
+// Package service start service
 package service
 
 import (
@@ -26,27 +26,29 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Ser struct {
+// ser Empty service
+type ser struct {
 }
 
-// Returns ser struct
-func BeginService() *Ser {
-	return &Ser{}
+// BeginService Returns ser struct.
+func BeginService() *ser {
+	return &ser{}
 }
 
-// service entrance
-func (ser *Ser) Start(confPath string) {
-
+// Start service entrance
+func (ser *ser) Start(confPath string) {
 	var wg = &sync.WaitGroup{}
 	// read app_instance_info.yaml file and transform to AppInstanceInfo object
 	conf, errGetConf := GetAppInstanceConf(confPath)
 	if errGetConf != nil {
 		log.Error("parse app_instance_info.yaml failed.")
+
 		return
 	}
-	_, errAppInst := util.GetAppInstanceId()
+	_, errAppInst := util.GetAppInstanceID()
 	if errAppInst != nil {
 		log.Error("get app instance id failed.")
+
 		return
 	}
 	// signed ak and sk, then request the token

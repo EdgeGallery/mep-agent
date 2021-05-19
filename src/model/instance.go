@@ -14,116 +14,126 @@
  *  limitations under the License.
  */
 
-// define the type information
+// Package model define the type information
 package model
 
+// AppInstanceInfo : Application instance info.
 type AppInstanceInfo struct {
 	ServiceInfoPosts                         []ServiceInfoPost                         `yaml:"serviceInfoPosts" json:"serviceInfoPosts"`
-	SerAvailabilityNotificationSubscriptions []SerAvailabilityNotificationSubscription `yaml:"serAvailabilityNotificationSubscriptions" json:"serAvailabilityNotificationSubscriptions"`
+	SerAvailabilityNotificationSubscriptions []serAvailabilityNotificationSubscription `yaml:"serAvailabilityNotificationSubscriptions" json:"serAvailabilityNotificationSubscriptions"`
 }
 
-// Service Information to be registered.
+// ServiceInfoPost Service Information to be registered.
 type ServiceInfoPost struct {
 	SerName           string         `yaml:"serName" json:"serName"`
-	SerCategory       CategoryRef    `yaml:"serCategory" json:"serCategory"`
+	SerCategory       categoryRef    `yaml:"serCategory" json:"serCategory"`
 	Version           string         `yaml:"version" json:"version"`
-	State             ServiceState   `yaml:"state" json:"state"`
+	State             serviceState   `yaml:"state" json:"state"`
 	TransportId       string         `yaml:"transportId" json:"transportId"`
-	TransportInfo     TransportInfo  `yaml:"transportInfo" json:"transportInfo"`
-	Serializer        SerializerType `yaml:"serializer" json:"serializer"`
-	ScopeOfLocality   LocalityType   `yaml:"scopeOfLocality" json:"scopeOfLocality"`
+	TransportInfo     transportInfo  `yaml:"transportInfo" json:"transportInfo"`
+	Serializer        serializerType `yaml:"serializer" json:"serializer"`
+	ScopeOfLocality   localityType   `yaml:"scopeOfLocality" json:"scopeOfLocality"`
 	ConsumedLocalOnly bool           `yaml:"consumedLocalOnly" json:"consumedLocalOnly"`
 	IsLocal           bool           `yaml:"isLocal" json:"isLocal"`
 	LivenessInterval  int            `yaml:"livenessInterval" json:"livenessInterval,omitempty"`
-	Links            _links       	 `json:"_links,omitempty"`
+	Links             _links         `json:"_links,omitempty"`
 	SerInstanceId     string         `json:"serInstanceId,omitempty"`
 }
 
-type ServiceInfo struct {
-	SerName           string         `json:"serName"`
-	Version           string         `json:"version"`
-
-}
-
-type CategoryRef struct {
+// categoryRef Service category.
+type categoryRef struct {
 	Href    string `yaml:"href" json:"href"`
 	Id      string `yaml:"id" json:"id"`
 	Name    string `yaml:"name" json:"name"`
 	Version string `yaml:"version" json:"version"`
 }
 
-type ServiceState string
+// serviceState Service state.
+type serviceState string
 
-// Transport Information of the service to be registered.
-type TransportInfo struct {
+// transportInfo Transport Information of the service to be registered.
+type transportInfo struct {
 	Id               string           `yaml:"id" json:"id"`
 	Name             string           `yaml:"name" json:"name"`
 	Description      string           `yaml:"description" json:"description"`
-	TransportType    TransportType    `yaml:"type" json:"type"`
+	TransportType    transportType    `yaml:"type" json:"type"`
 	Protocol         string           `yaml:"protocol" json:"protocol"`
 	Version          string           `yaml:"version" json:"version"`
-	Endpoint         EndPointInfo     `yaml:"endpoint" json:"endpoint"`
-	Security         SecurityInfo     `yaml:"security" json:"security"`
-	ImplSpecificInfo ImplSpecificInfo `yaml:"implSpecificInfo" json:"implSpecificInfo"`
+	Endpoint         endPointInfo     `yaml:"endpoint" json:"endpoint"`
+	Security         securityInfo     `yaml:"security" json:"security"`
+	ImplSpecificInfo implSpecificInfo `yaml:"implSpecificInfo" json:"implSpecificInfo"`
 }
 
-type TransportType string
+type transportType string
 
-// Endpoint of the service to be registered.
-type EndPointInfo struct {
-	Addresses   []EndPointInfoAddress `yaml:"addresses" json:"addresses"`
+// endPointInfo: Endpoint of the service to be registered.
+type endPointInfo struct {
+	Addresses []endPointInfoAddress `yaml:"addresses" json:"addresses"`
 }
 
-type EndPointInfoAddress struct {
+// endPointInfoAddress: Endpoint information.
+type endPointInfoAddress struct {
 	Host string `yaml:"host" json:"host"`
 	Port uint32 `yaml:"port" json:"port"`
 }
 
-type SecurityInfo struct {
-	OAuth2Info SecurityInfoOAuth2Info `yaml:"oAuth2Info" json:"oAuth2Info"`
+// securityInfo: Security information.
+type securityInfo struct {
+	OAuth2Info securityInfoOAuth2Info `yaml:"oAuth2Info" json:"oAuth2Info"`
 }
 
-type SecurityInfoOAuth2Info struct {
-	GrantTypes    []SecurityInfoOAuth2InfoGrantType `yaml:"grantTypes" json:"grantTypes"`
+// securityInfoOAuth2Info Security Auth2 information.
+type securityInfoOAuth2Info struct {
+	GrantTypes    []securityInfoOAuth2InfoGrantType `yaml:"grantTypes" json:"grantTypes"`
 	TokenEndpoint string                            `yaml:"tokenEndpoint" json:"tokenEndpoint"`
 }
 
-type SecurityInfoOAuth2InfoGrantType string
+// securityInfoOAuth2InfoGrantType Security Auth2 grant type.
+type securityInfoOAuth2InfoGrantType string
 
-type ImplSpecificInfo struct {
+// implSpecificInfo Impl specific info if any.
+type implSpecificInfo struct {
 }
 
-type SerializerType string
+// serializerType Serializer Type.
+type serializerType string
 
-type LocalityType string
+// localityType : Scope of Locality Type.
+type localityType string
 
-type SerAvailabilityNotificationSubscription struct {
+// serAvailabilityNotificationSubscription : Service Availability Notification Subscription.
+type serAvailabilityNotificationSubscription struct {
 	SubscriptionType  string                                                   `yaml:"subscriptionType" json:"subscriptionType"`
 	CallbackReference string                                                   `yaml:"callbackReference" json:"callbackReference"`
-	Links             Self                                                     `yaml:"links" json:"links"`
-	FilteringCriteria SerAvailabilityNotificationSubscriptionFilteringCriteria `yaml:"filteringCriteria" json:"filteringCriteria"`
+	Links             self                                                     `yaml:"links" json:"links"`
+	FilteringCriteria serAvailabilityNotificationSubscriptionFilteringCriteria `yaml:"filteringCriteria" json:"filteringCriteria"`
 }
 
-type Self struct {
-	Self LinkType `yaml:"self" json:"self"`
+// self link.
+type self struct {
+	Self linkType `yaml:"self" json:"self"`
 }
 
-type LinkType struct {
+// linkType Link type.
+type linkType struct {
 	Href string `yaml:"href" json:"href"`
 }
 
-type SerAvailabilityNotificationSubscriptionFilteringCriteria struct {
+// serAvailabilityNotificationSubscriptionFilteringCriteria : Service Availability Notification Subscription FilteringCriteria.
+type serAvailabilityNotificationSubscriptionFilteringCriteria struct {
 	SerInstanceIds []string       `yaml:"serInstanceIds" json:"serInstanceIds"`
 	SerNames       []string       `yaml:"serNames" json:"serNames"`
-	SerCategories  []CategoryRef  `yaml:"serCategories" json:"serCategories"`
-	States         []ServiceState `yaml:"states" json:"states"`
+	SerCategories  []categoryRef  `yaml:"serCategories" json:"serCategories"`
+	States         []serviceState `yaml:"states" json:"states"`
 	IsLocal        bool           `yaml:"isLocal" json:"isLocal"`
 }
 
+// _links : Liveness link.
 type _links struct {
-	Self LivenessLinktype `yaml:"self" json:"self"`
+	Self livenessLinktype `yaml:"self" json:"self"`
 }
 
-type LivenessLinktype struct {
+// Liveness link type.
+type livenessLinktype struct {
 	Liveness string `json:"liveness"`
 }

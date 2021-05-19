@@ -25,11 +25,11 @@ import (
 func TestValidateIp(t *testing.T) {
     convey.Convey("ValidateDns", t, func() {
         convey.Convey("ValidateIpSuccess", func() {
-            convey.So(util.ValidateDns("mep-api-gw"), convey.ShouldBeNil)
+            convey.So(util.ValidateDNS("mep-api-gw"), convey.ShouldBeNil)
         })
 
         convey.Convey("ValidateDnsFail", func() {
-            convey.So(util.ValidateDns("127.0.0."), convey.ShouldNotBeNil)
+            convey.So(util.ValidateDNS("127.0.0."), convey.ShouldNotBeNil)
         })
     })
 }

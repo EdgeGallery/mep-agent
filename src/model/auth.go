@@ -14,9 +14,10 @@
  *  limitations under the License.
  */
 
-// aksk model
+// Package model Authentication model
 package model
 
+// Auth Authentication information.
 type Auth struct {
 	SecretKey *[]byte
 	AccessKey string

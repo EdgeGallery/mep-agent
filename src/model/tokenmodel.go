@@ -14,9 +14,10 @@
  *  limitations under the License.
  */
 
-// token model
+// Package model token model
 package model
 
+// TokenModel : Token model.
 type TokenModel struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`

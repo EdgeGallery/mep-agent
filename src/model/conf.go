@@ -13,9 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-// define the conf model
+
+// Package model define the conf model
 package model
 
+// AppConfInfo : App configuration information.
 type AppConfInfo struct {
 	SslCiphers string `yaml:"sslCiphers" json:"sslCiphers"`
 }
