@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-// Clear util
+// Package util utility package
 package util
 
 import (
@@ -25,34 +25,34 @@ import (
 	"time"
 )
 
-//App configuration properties
-type AppConfigProperties map[string]*[]byte
+// appConfigProperties App configuration properties.
+type appConfigProperties map[string]*[]byte
 
-//Application configurations
-var AppConfig = AppConfigProperties{}
+// AppConfig Application configurations.
+var AppConfig = appConfigProperties{}
 
-// Token
+// MepToken Token.
 var MepToken = model.TokenModel{}
 
-//Mark initial token has been received
+// FirstToken Mark initial token has been received.
 var FirstToken = false
 
-//App instance ID from configuration
-var AppInstanceId string
+// AppInstanceID App instance ID from configuration.
+var AppInstanceID string
 
-//Refresh token timer
+// RefreshTimer Refresh token timer.
 var RefreshTimer *time.Timer
 
-//Timer buffer 5 sec
+// RefreshTimeBuffer Timer buffer 5 sec.
 const RefreshTimeBuffer = 5
 
 const (
-	AK        string = "AK"
-	SK        string = "SK"
-	APPINSTID string = "APPINSTID"
+	ak        string = "ak"
+	sk        string = "sk"
+	appInstID string = "APPINSTID"
 )
 
-// Clears byte array
+// ClearByteArray Clears byte array.
 func ClearByteArray(data []byte) {
 	if data == nil {
 		return
@@ -62,44 +62,47 @@ func ClearByteArray(data []byte) {
 	}
 }
 
-// clear [string, *[]byte] map, called only in error case
+// ClearMap clear [string, *[]byte] map, called only in error case.
 func ClearMap() {
 	for _, element := range AppConfig {
 		ClearByteArray(*element)
 	}
 }
 
-//read and clearing the variable from the environment
+// ReadTokenFromEnvironment read and clearing the variable from the environment.
 func ReadTokenFromEnvironment() error {
-	//clean the environment
-	defer os.Unsetenv(AK)
-	defer os.Unsetenv(SK)
+	// clean the environment
+	defer os.Unsetenv(ak)
+	defer os.Unsetenv(sk)
 
-	ak := os.Getenv(AK)
-	sk := os.Getenv(SK)
+	akVal := os.Getenv(ak)
+	skVal := os.Getenv(sk)
 
-	if len(ak) == 0 || len(sk) == 0 {
+	if len(akVal) == 0 || len(skVal) == 0 {
 		err := errors.New("ak and sk keys should be set in env variable")
 		log.Error("Keys should not be empty")
+
 		return err
 	}
-	akByte := []byte(ak)
+	akByte := []byte(akVal)
 	AppConfig["ACCESS_KEY"] = &akByte
-	skByte := []byte(sk)
+	skByte := []byte(skVal)
 	AppConfig["SECRET_KEY"] = &skByte
 	log.Infof("Ak: %s", akByte)
+
 	return nil
 }
 
-//Read application instanceId
-func GetAppInstanceId() (string, error) {
-	defer os.Unsetenv(APPINSTID)
-	instId := os.Getenv(APPINSTID)
-	if len(instId) == 0 {
+// GetAppInstanceID Read application instanceId.
+func GetAppInstanceID() (string, error) {
+	defer os.Unsetenv(appInstID)
+	instID := os.Getenv(appInstID)
+	if len(instID) == 0 {
 		err := errors.New("appInstanceId should be set in env variable")
 		log.Error("appInstanceId must be set")
+
 		return "", err
 	}
-	AppInstanceId = instId
-	return instId, nil
+	AppInstanceID = instID
+	return instID, nil
 }

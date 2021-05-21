@@ -40,10 +40,10 @@ func TestHeartBeatRequestToMep(t *testing.T)  {
 			w.WriteHeader(http.StatusNoContent)
 
 		}))
-		patch1 := gomonkey.ApplyFunc(config.GetServerUrl, func() (config.ServerUrl, error) {
-			return config.ServerUrl{MepHeartBeatUrl: ts.URL}, nil
+		patch1 := gomonkey.ApplyFunc(config.GetServerURL, func() (config.ServerURL, error) {
+			return config.ServerURL{MepHeartBeatURL: ts.URL}, nil
 		})
-		patch2 := gomonkey.ApplyFunc(service.TlsConfig, func() (*tls.Config, error) {
+		patch2 := gomonkey.ApplyFunc(service.TLSConfig, func() (*tls.Config, error) {
 			return nil, nil
 		})
 

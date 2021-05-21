@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Test package
 package test
 
 import (
@@ -33,7 +34,7 @@ func TestGetServerUrl(t *testing.T) {
 	})
 	defer patch1.Reset()
 
-	patch2 := gomonkey.ApplyFunc(util.ValidateDns, func(string) error {
+	patch2 := gomonkey.ApplyFunc(util.ValidateDNS, func(string) error {
 		return nil
 	})
 	defer patch2.Reset()
@@ -43,6 +44,6 @@ func TestGetServerUrl(t *testing.T) {
 	})
 	defer patch3.Reset()
 
-	_, err := config.GetServerUrl()
+	_, err := config.GetServerURL()
 	assert.Equal(t, nil, err)
 }

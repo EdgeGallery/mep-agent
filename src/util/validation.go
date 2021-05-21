@@ -14,49 +14,49 @@
  *  limitations under the License.
  */
 
-// validation util
+// Package util utility
 package util
 
 import (
 	"errors"
-	"github.com/go-playground/validator/v10"
 	"net"
 	"regexp"
+
+	"github.com/go-playground/validator/v10"
 )
 
 const (
-	//IP_PATTERN   string = `^[a-z][a-z-]{0,126}[a-z]$`
-	PORT_PATTERN string = `^([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$`
-	//AK_PATTERN   string = `^\w{20}$`
-	//SK_PATTERN   string = `^\w{64}$`
-	DOMAIN_PATTERN string = `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$`
-	DNS_PATTERN string = `^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`
-	maxHostNameLen = 253
+	// PortPattern Regular expression for Port.
+	PortPattern    string = `^([1-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$`
+	// domainPattern Regular expression for Domain.
+	domainPattern  string = `^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])(\.([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]{0,61}[a-zA-Z0-9]))*$`
+	dnsPattern     string = `^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`
+	maxHostNameLen        = 253
 )
 
-// Validates Ip address
-func ValidateDns(ip string) error {
+// ValidateDNS Validates Ip address.
+func ValidateDNS(ip string) error {
 	ipv := net.ParseIP(ip)
 	if ipv != nil && (ipv.IsMulticast() || ipv.Equal(net.IPv4bcast)) {
 		return errors.New("invalid dns ip")
 	}
-
 	if ipv != nil {
 		return nil
 	}
 
-	return ValidateByPattern(DNS_PATTERN, ip)
+	return ValidateByPattern(dnsPattern, ip)
 }
 
-// Validates domain name
+// ValidateDomainName Validates domain name.
 func ValidateDomainName(name string) error {
 	if len(name) == 0 || len(name) > maxHostNameLen {
 		return errors.New("validate domain name failed")
 	}
-	return ValidateByPattern(DOMAIN_PATTERN, name)
+
+	return ValidateByPattern(domainPattern, name)
 }
 
-// Validates given string with pattern
+// ValidateByPattern Validates given string with pattern.
 func ValidateByPattern(pattern string, param string) error {
 	res, errMatch := regexp.MatchString(pattern, param)
 	if errMatch != nil {
@@ -65,10 +65,11 @@ func ValidateByPattern(pattern string, param string) error {
 	if !res {
 		return errors.New("validate failed")
 	}
+
 	return nil
 }
 
-// Validates UUID
+// ValidateUUID Validates UUID.
 func ValidateUUID(id string) error {
 	if len(id) != 0 {
 		validate := validator.New()
@@ -79,6 +80,6 @@ func ValidateUUID(id string) error {
 	} else {
 		return errors.New("UUID validate failed")
 	}
+
 	return nil
 }
-

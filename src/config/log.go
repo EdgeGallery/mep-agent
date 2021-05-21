@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-// logrus config
+// Package config logrus config
 package config
 
 import (
@@ -40,9 +40,8 @@ func init() {
 			Compress:   true, // compress
 		}
 		logrus.SetOutput(ioWriter)
-
 	} else {
-		logrus.Warn("Failed to log to file, using default stderr")
+		logrus.Warn("Failed to log to file, using default stderr.")
 	}
 
 	logrus.SetLevel(logrus.InfoLevel)

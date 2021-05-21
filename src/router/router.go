@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package route routes package
 package route
 
 import (
@@ -25,4 +26,3 @@ func init() {
 	beego.Router("/mep-agent/v1/token", &controllers.TokenController{})
 	beego.Router("/mep-agent/v1/endpoint/:serName", &controllers.EndpointController{})
 }
-

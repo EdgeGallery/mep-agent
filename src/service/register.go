@@ -14,12 +14,13 @@
  *  limitations under the License.
  */
 
-// register to mep service
+// Package service register to mep service
 package service
 
 import (
 	"encoding/json"
 	"errors"
+	log "github.com/sirupsen/logrus"
 	"mep-agent/src/config"
 	"mep-agent/src/model"
 	"mep-agent/src/util"
@@ -27,104 +28,106 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 const (
-	RETRY_TIMES       int = 5
-	RETRY_PERIOD      int = 30
-	MAX_SERVICE_COUNT int = 50
+	retryTimes      int = 5
+	retryPeriod     int = 30
+	maxServiceCount int = 50
 )
 
-type RegisterData struct {
+type registerData struct {
 	token *model.TokenModel
 	data  string
 	url   string
 }
 
+// dataStore : Store service info posts.
 var dataStore []model.ServiceInfoPost
 
-// Registers service to mep
+// RegisterToMep Registers service to mep.
 func RegisterToMep(conf model.AppInstanceInfo, wg *sync.WaitGroup) ([]model.ServiceInfoPost, error) {
 	log.Info("begin to register service to mep")
 	serviceInfos := conf.ServiceInfoPosts
-	appInstanceId := util.AppInstanceId
+	appInstanceID := util.AppInstanceID
 
-	if len(serviceInfos) > MAX_SERVICE_COUNT {
-		log.Error("Failed to register all the services to mep, appInstanceId is " + appInstanceId)
-		return nil, errors.New("Registration of service failed, cannot contain more than " +
-			strconv.Itoa(MAX_SERVICE_COUNT) + " services in a single request")
+	if len(serviceInfos) > maxServiceCount {
+		log.Error("Failed to register all the services to mep, appInstanceId is " + appInstanceID)
+		return nil, errors.New("registration of service failed, cannot contain more than " +
+			strconv.Itoa(maxServiceCount) + " services in a single request")
 	}
 
-	if util.ValidateUUID(appInstanceId) != nil {
+	if util.ValidateUUID(appInstanceID) != nil {
 		return nil, errors.New("validate appInstanceId failed")
 	}
 
-	url := strings.Replace(config.ServerUrlConfig.MepServerRegisterUrl, "${appInstanceId}", appInstanceId, 1)
+	url := strings.Replace(config.ServerURLConfig.MepServerRegisterURL, "${appInstanceId}", appInstanceID, 1)
 
 	for _, serviceInfo := range serviceInfos {
-		data, errJsonMarshal := json.Marshal(serviceInfo)
-		if errJsonMarshal != nil {
+		data, errJSONMarshal := json.Marshal(serviceInfo)
+		if errJSONMarshal != nil {
 			log.Error("Failed to marshal service info to object")
+
 			continue
 		}
-		var registerData = RegisterData{data: string(data), url: url, token: &util.MepToken}
-		resBody, errPostRequest := PostRegisterRequest(registerData)
+		var registerInfo = registerData{data: string(data), url: url, token: &util.MepToken}
+		resBody, errPostRequest := postRegisterRequest(registerInfo)
 		if errPostRequest != nil {
-			log.Error("failed to register to mep, appInstanceId is " + appInstanceId +
+			log.Error("failed to register to mep, appInstanceId is " + appInstanceID +
 				", serviceName is " + serviceInfo.SerName)
 			wg.Add(1)
-			go retryRegister(registerData, appInstanceId, serviceInfo, wg)
+			go retryRegister(registerInfo, appInstanceID, serviceInfo, wg)
 		} else {
-			log.Info("register to mep success, appInstanceId is " + appInstanceId +
+			log.Info("register to mep success, appInstanceId is " + appInstanceID +
 				", serviceName is " + serviceInfo.SerName)
-			_, errPostRequest = storeRegisterData(resBody)
+			errPostRequest = storeRegisterData(resBody)
 			if errPostRequest != nil {
 				continue
 			}
-
 		}
-
 	}
 	log.Info("services registered to mep count ", len(dataStore))
+
 	return dataStore, nil
 }
 
-func retryRegister(registerData RegisterData, appInstanceId string, serviceInfo model.ServiceInfoPost,
+func retryRegister(registerData registerData, appInstanceID string, serviceInfo model.ServiceInfoPost,
 		wg *sync.WaitGroup) {
 
 	defer wg.Done()
 
-	for i := 1; i < RETRY_TIMES; i++ {
+	for i := 1; i < retryTimes; i++ {
 		log.Warn("Failed to register to mep, register will retry 5 times, already register " + strconv.Itoa(i) +
-			" times, the next register will begin after " + strconv.Itoa(RETRY_PERIOD*i) + " seconds.")
-		time.Sleep(time.Duration(RETRY_PERIOD*i) * time.Second)
+			" times, the next register will begin after " + strconv.Itoa(retryPeriod*i) + " seconds.")
+		time.Sleep(time.Duration(retryPeriod*i) * time.Second)
 
-		resBody, errPostRequest := PostRegisterRequest(registerData)
+		resBody, errPostRequest := postRegisterRequest(registerData)
 		if errPostRequest != nil {
-			log.Error("Failed to register to mep, appInstanceId is " + appInstanceId +
+			log.Error("Failed to register to mep, appInstanceId is " + appInstanceID +
 				", serviceName is " + serviceInfo.SerName)
 		} else {
-			log.Info("Register to mep success, appInstanceId is " + appInstanceId +
+			log.Info("Register to mep success, appInstanceId is " + appInstanceID +
 				", serviceName is " + serviceInfo.SerName)
-			_, errJsonUnMarshal := storeRegisterData(resBody)
-			if errJsonUnMarshal != nil {
-				log.Error("Failed to unmarshal object to service info " + errJsonUnMarshal.Error())
+			errJSONUnMarshal := storeRegisterData(resBody)
+			if errJSONUnMarshal != nil {
+				log.Error("Failed to unmarshal object to service info " + errJSONUnMarshal.Error())
 			}
+
 			break
 		}
 	}
 }
 
-func storeRegisterData(resBody string) ([]model.ServiceInfoPost, error) {
-	data := model.ServiceInfoPost{}
-	errJsonUnMarshal := json.Unmarshal([]byte(resBody), &data)
+func storeRegisterData(resBody string) error {
+	var data = model.ServiceInfoPost{}
+	errJSONUnMarshal := json.Unmarshal([]byte(resBody), &data)
 
-	if errJsonUnMarshal != nil {
+	if errJSONUnMarshal != nil {
 		log.Error("Failed to unmarshal object to service info")
-		return nil, errJsonUnMarshal
+
+		return errJSONUnMarshal
 	}
 	dataStore = append(dataStore,data)
-	return dataStore, nil
+
+	return nil
 }

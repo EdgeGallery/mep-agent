@@ -14,72 +14,78 @@
  * limitations under the License.
  */
 
+// Package controllers Endpoint controller
 package controllers
 
 import (
 	"encoding/json"
+	"github.com/astaxie/beego"
+	log "github.com/sirupsen/logrus"
 	"mep-agent/src/config"
 	"mep-agent/src/service"
 	"mep-agent/src/util"
-
-	"github.com/astaxie/beego"
-	log "github.com/sirupsen/logrus"
+	"net/http"
 )
 
+// EndpointController beego Endpoint Controller.
 type EndpointController struct {
 	beego.Controller
 }
 
+// Service Service information.
 type Service struct {
 	TransportInfo TransportInfo `yaml:"transportInfo" json:"transportInfo"`
 }
 
-// Transport information of the service.
+// TransportInfo Transport information of the service.
 type TransportInfo struct {
 	Id          string       `yaml:"id" json:"id"`
 	Name        string       `yaml:"name" json:"name"`
 	Description string       `yaml:"description" json:"description"`
 	Protocol    string       `yaml:"protocol" json:"protocol"`
 	Version     string       `yaml:"version" json:"version"`
-	Endpoint    EndPointInfo `yaml:"endpoint" json:"endpoint"`
+	Endpoint    endPointInfo `yaml:"endpoint" json:"endpoint"`
 }
 
-// End point of the service.
-type EndPointInfo struct {
+// endPointInfo End point of the service.
+type endPointInfo struct {
 	Uris        []string              `json:"uris" validate:"omitempty,dive,uri"`
-	Addresses   []EndPointInfoAddress `json:"addresses" validate:"omitempty,dive"`
+	Addresses   []endPointInfoAddress `json:"addresses" validate:"omitempty,dive"`
 	Alternative interface{}           `json:"alternative"`
 }
 
-type EndPointInfoAddress struct {
+// endPointInfoAddress Endpoint info address.
+type endPointInfoAddress struct {
 	Host string `json:"host" validate:"required"`
 	Port uint32 `json:"port" validate:"required,gt=0,lte=65535"`
 }
 
+// Get handles endpoint request from app.
 func (c *EndpointController) Get() {
 	log.Info("received get endpoint request from app")
+
 	serName := c.Ctx.Input.Param(":serName")
-
-	url := config.ServerUrlConfig.MepServiceDiscoveryUrl + serName
-
-	requestData := service.RequestData{Data: "", Url: url, Token: &util.MepToken}
+	url := config.ServerURLConfig.MepServiceDiscoveryURL + serName
+	requestData := service.RequestData{Data: "", URL: url, Token: &util.MepToken}
 	resBody, errPostRequest := service.SendQueryRequest(requestData)
 	if errPostRequest != nil {
 		log.Error("Failed heart beat request to mep, URL is " + url)
 	}
-
 	var resBodyMap []Service
+
 	log.Info("resBodyMap: ", resBody)
+
 	err := json.Unmarshal([]byte(resBody), &resBodyMap)
 	if err != nil {
 		log.Error("Unmarshal failed")
 		c.Data["json"] = "Service does not exist."
-		c.Ctx.ResponseWriter.WriteHeader(400)
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
 	} else {
 		transportInfo := resBodyMap[0].TransportInfo
 		log.Info("Endpoint: ", transportInfo.Endpoint)
 		c.Data["json"] = transportInfo.Endpoint
-		c.Ctx.ResponseWriter.WriteHeader(200)
+		c.Ctx.ResponseWriter.WriteHeader(http.StatusOK)
 	}
+
 	c.ServeJSON()
 }

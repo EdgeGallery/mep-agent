@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-// heart service
+// Package service heart service
 package service
 
 import (
@@ -24,30 +24,31 @@ import (
 	"mep-agent/src/model"
 	"mep-agent/src/util"
 )
-
-type HeartBeatData struct {
+// heartBeatData: Heartbeat information.
+type heartBeatData struct {
 	token *model.TokenModel
 	data  string
 	url   string
 }
 
-type ServiceLivenessUpdate struct {
+
+type serviceLivenessUpdate struct {
 	State string `json:"state"`
 }
 
-// Send service heartbeat to MEP
+// HeartBeatRequestToMep Send service heartbeat to MEP.
 func HeartBeatRequestToMep(serviceInfo model.ServiceInfoPost) {
-
-	heartBeatRequest := ServiceLivenessUpdate{State: "ACTIVE"}
-	data, errJsonMarshal := json.Marshal(heartBeatRequest)
-	if errJsonMarshal != nil {
+	heartBeatRequest := serviceLivenessUpdate{State: "ACTIVE"}
+	data, errJSONMarshal := json.Marshal(heartBeatRequest)
+	if errJSONMarshal != nil {
 		log.Error("Failed to marshal service info to object")
+
 		return
 	}
 
-	url := config.ServerUrlConfig.MepHeartBeatUrl + serviceInfo.Links.Self.Liveness
-	var heartBeatData = HeartBeatData{data: string(data), url: url, token: &util.MepToken}
-	_, errPostRequest := SendHeartBeatRequest(heartBeatData)
+	url := config.ServerURLConfig.MepHeartBeatURL + serviceInfo.Links.Self.Liveness
+	var heartBeatInfo = heartBeatData{data: string(data), url: url, token: &util.MepToken}
+	_, errPostRequest := sendHeartBeatRequest(heartBeatInfo)
 	if errPostRequest != nil {
 		log.Error("Failed heart beat request to mep, URL is " + url)
 	}

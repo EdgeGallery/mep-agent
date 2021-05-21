@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-// util service
+// Package service util service
 package service
 
 import (
@@ -33,23 +33,26 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const AUTHORIZATION = "Authorization"
+// authorization authorization string.
+const authorization = "Authorization"
 
-var TlsConf *tls.Config
+// TLSConf Tls configuration.
+var TLSConf *tls.Config
 
+// RequestData : Request Data.
 type RequestData struct {
 	Token *model.TokenModel
 	Data  string
-	Url   string
+	URL   string
 }
 
-// const
+// cipherSuiteMap cipher Suites.
 var cipherSuiteMap = map[string]uint16{
 	"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256": tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
 	"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384": tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
 }
 
-// get yaml and parse to AppInstanceInfo object
+// GetAppInstanceConf get yaml and parse to AppInstanceInfo object.
 func GetAppInstanceConf(path string) (model.AppInstanceInfo, error) {
 	yamlFile, err := ioutil.ReadFile(path)
 	var info model.AppInstanceInfo
@@ -60,6 +63,7 @@ func GetAppInstanceConf(path string) (model.AppInstanceInfo, error) {
 	if err != nil {
 		return info, err
 	}
+
 	return info, nil
 }
 
@@ -73,20 +77,21 @@ func getAPPConf(path string) (model.AppConfInfo, error) {
 	if err != nil {
 		return info, err
 	}
+
 	return info, nil
 }
 
-// register to mep
-func PostRegisterRequest(registerData RegisterData) (string, error) {
+// postRegisterRequest : register to mep.
+func postRegisterRequest(registerData registerData) (string, error) {
 	// construct http request
 	req, errNewRequest := http.NewRequest("POST", registerData.url, strings.NewReader(registerData.data))
 	if errNewRequest != nil {
 		return "", errNewRequest
 	}
-	req.Header.Set(AUTHORIZATION, registerData.token.TokenType+" "+registerData.token.AccessToken)
+	req.Header.Set(authorization, registerData.token.TokenType+" "+registerData.token.AccessToken)
 
 	// send http request
-	response, errDo := DoRequest(req)
+	response, errDo := doRequest(req)
 	if errDo != nil {
 		return "", errDo
 	}
@@ -104,8 +109,8 @@ func PostRegisterRequest(registerData RegisterData) (string, error) {
 	return string(body), nil
 }
 
-// get token from mep
-func PostTokenRequest(param string, url string, auth model.Auth) (string, error) {
+// get token from mep.
+func postTokenRequest(param string, url string, auth model.Auth) (string, error) {
 	log.Infof("PostTokenRequest param: %s, url: %s, ak: %s", param, url, auth.AccessKey)
 	// construct http request
 	req, errNewRequest := http.NewRequest("POST", url, strings.NewReader(param))
@@ -115,21 +120,21 @@ func PostTokenRequest(param string, url string, auth model.Auth) (string, error)
 
 	// request header
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set(util.DATE_HEADER, time.Now().Format(util.DATE_FORMAT))
+	req.Header.Set(util.DateHeader, time.Now().Format(util.DateFormat))
 	req.Header.Set("Host", req.Host)
 	// calculate signature by safe algorithm
 	sign := util.Sign{
 		AccessKey: auth.AccessKey,
 		SecretKey: auth.SecretKey,
 	}
-	authorization, errSign := sign.GetAuthorizationValueWithSign(req)
+	authorizationVal, errSign := sign.GetAuthorizationValueWithSign(req)
 	if errSign != nil {
 		return "", errSign
 	}
-	req.Header.Set(AUTHORIZATION, authorization)
+	req.Header.Set(authorization, authorizationVal)
 
 	// send http request
-	response, errDo := DoRequest(req)
+	response, errDo := doRequest(req)
 	if errDo != nil {
 		return "", errDo
 	}
@@ -145,22 +150,21 @@ func PostTokenRequest(param string, url string, auth model.Auth) (string, error)
 		return "", errors.New("request failed, status is " + strconv.Itoa(response.StatusCode))
 	}
 	log.Infof("response status: %s", response.Status)
+
 	return string(body), nil
 }
 
-// do request
-func DoRequest(req *http.Request) (*http.Response, error) {
-
-	tr := &http.Transport{
-		TLSClientConfig: TlsConf,
+// doRequest: do request.
+func doRequest(req *http.Request) (*http.Response, error) {
+	var tr = &http.Transport{
+		TLSClientConfig: TLSConf,
 	}
 	client := &http.Client{Transport: tr}
-
 	return client.Do(req)
 }
 
-// Constructs tls configuration
-func TlsConfig() (*tls.Config, error) {
+// TLSConfig : Constructs tls configuration.
+func TLSConfig() (*tls.Config, error) {
 	appConf, errGetConf := getAPPConf("./conf/app_conf.yaml")
 	if errGetConf != nil {
 		log.Error("parse app_conf.yaml failed")
@@ -198,6 +202,7 @@ func getCipherSuites(sslCiphers string) []uint16 {
 		mapValue, ok := cipherSuiteMap[cipherName]
 		if !ok {
 			log.Warn("Not recommended cipher suite.")
+
 			return nil
 		}
 		cipherSuiteArr = append(cipherSuiteArr, mapValue)
@@ -205,18 +210,19 @@ func getCipherSuites(sslCiphers string) []uint16 {
 	if len(cipherSuiteArr) > 0 {
 		return cipherSuiteArr
 	}
+
 	return nil
 }
 
-// Send Service heartbeat to MEP
-func SendHeartBeatRequest(heartBeatData HeartBeatData) (string, error) {
+// sendHeartBeatRequest Send Service heartbeat to MEP.
+func sendHeartBeatRequest(heartBeatData heartBeatData) (string, error) {
 	req, errNewRequest := http.NewRequest("PUT", heartBeatData.url, strings.NewReader(heartBeatData.data))
 	if errNewRequest != nil {
 		return "", errNewRequest
 	}
-	req.Header.Set(AUTHORIZATION, heartBeatData.token.TokenType+" "+heartBeatData.token.AccessToken)
+	req.Header.Set(authorization, heartBeatData.token.TokenType+" "+heartBeatData.token.AccessToken)
 
-	response, errDo := DoRequest(req)
+	response, errDo := doRequest(req)
 	if errDo != nil {
 		return "", errDo
 	}
@@ -228,20 +234,20 @@ func SendHeartBeatRequest(heartBeatData HeartBeatData) (string, error) {
 	}
 	if response.StatusCode == http.StatusOK || response.StatusCode == http.StatusNoContent {
 		return string(body), nil
-	} else {
-		return "", errors.New("heartbeat request failed, status is " + strconv.Itoa(response.StatusCode))
 	}
+
+	return "", errors.New("heartbeat request failed, status is " + strconv.Itoa(response.StatusCode))
 }
 
-// Query endpoint from MEP
+// SendQueryRequest Query endpoint from MEP.
 func SendQueryRequest(requestData RequestData) (string, error) {
-	req, errNewRequest := http.NewRequest("GET", requestData.Url, strings.NewReader(requestData.Data))
+	req, errNewRequest := http.NewRequest("GET", requestData.URL, strings.NewReader(requestData.Data))
 	if errNewRequest != nil {
 		return "", errNewRequest
 	}
-	req.Header.Set(AUTHORIZATION, requestData.Token.TokenType+" "+requestData.Token.AccessToken)
+	req.Header.Set(authorization, requestData.Token.TokenType+" "+requestData.Token.AccessToken)
 
-	response, errDo := DoRequest(req)
+	response, errDo := doRequest(req)
 	if errDo != nil {
 		return "", errDo
 	}
@@ -253,7 +259,6 @@ func SendQueryRequest(requestData RequestData) (string, error) {
 	}
 	if response.StatusCode == http.StatusOK || response.StatusCode == http.StatusNoContent {
 		return string(body), nil
-	} else {
-		return "", errors.New("heartbeat request failed, status is " + strconv.Itoa(response.StatusCode))
 	}
+	return "", errors.New("send query request failed, status is " + strconv.Itoa(response.StatusCode))
 }

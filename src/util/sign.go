@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-// signature service
+// Package util signature service
 package util
 
 import (
@@ -34,20 +34,22 @@ import (
 )
 
 const (
-	SEPARATOR      string = "/"
-	LINE_SEPARATOR string = "\n"
-	DATE_FORMAT    string = "20060102T150405Z"
-	ALGORITHM      string = "SDK-HMAC-SHA256"
-	DATE_HEADER    string = "x-sdk-date"
+	separator     string = "/"
+	lineSeparator string = "\n"
+	// DateFormat Date format
+	DateFormat    string = "20060102T150405Z"
+	algorithm     string = "SDK-HMAC-SHA256"
+	// DateHeader Date header.
+	DateHeader    string = "x-sdk-date"
 )
 
-
+//Sign Signature
 type Sign struct {
 	SecretKey *[]byte
 	AccessKey string
 }
 
-// Returns authorization value with signature
+// GetAuthorizationValueWithSign Returns authorization value with signature.
 func (sig *Sign) GetAuthorizationValueWithSign(req *http.Request) (string, error) {
 	signature, errGetSignature := sig.GetSignature(req)
 	if errGetSignature != nil {
@@ -57,7 +59,7 @@ func (sig *Sign) GetAuthorizationValueWithSign(req *http.Request) (string, error
 	return getAuthorizationHeaderValue(signature, sig.AccessKey, getSignedHeaders(req)), nil
 }
 
-// get signature from request
+// GetSignature get signature from request.
 func (sig *Sign) GetSignature(req *http.Request) (string, error) {
 	if req == nil {
 		return "", errors.New("request is nil")
@@ -68,7 +70,7 @@ func (sig *Sign) GetSignature(req *http.Request) (string, error) {
 		return "", errGetCanonicalRequest
 	}
 	// create string to sign
-	stringToSign, errGetStringToSign := getStringToSign(canonicalRequest, req.Header.Get(DATE_HEADER))
+	stringToSign, errGetStringToSign := getStringToSign(canonicalRequest, req.Header.Get(DateHeader))
 	if errGetStringToSign != nil {
 		return "", errGetStringToSign
 	}
@@ -80,14 +82,12 @@ func (sig *Sign) GetSignature(req *http.Request) (string, error) {
 	return signature, nil
 }
 
-// construct canonical request and return
-func getCanonicalRequest(req *http.Request) (string, error) {
-
-	// begin construct canonical request
+// construct canonical request and return.
+func getCanonicalRequest(req *http.Request) (string, error) { // begin construct canonical request
 	// request method
 	method := req.Method
 	// request uri
-	uri := getCanonicalUri(req)
+	uri := getCanonicalURI(req)
 	// query string
 	query := getCanonicalQueryString(req)
 	// request headers
@@ -100,13 +100,13 @@ func getCanonicalRequest(req *http.Request) (string, error) {
 		return "", errGetRequestBodyHash
 	}
 	// construct complete
-	return strings.Join([]string{method, uri, query, headersReq, headersSign, hexEncodeBody}, LINE_SEPARATOR), nil
+	return strings.Join([]string{method, uri, query, headersReq, headersSign, hexEncodeBody}, lineSeparator), nil
 }
 
-// construct canonical uri can return
-func getCanonicalUri(req *http.Request) string {
+// construct canonical uri can return.
+func getCanonicalURI(req *http.Request) string {
 	// split uri to []string
-	paths := strings.Split(req.URL.Path, SEPARATOR)
+	paths := strings.Split(req.URL.Path, separator)
 	var uris []string
 	for _, path := range paths {
 		// ignore the empty string and relative path string
@@ -116,12 +116,12 @@ func getCanonicalUri(req *http.Request) string {
 		uris = append(uris, url.QueryEscape(path))
 	}
 	// create canonical uri
-	canonicalUri := SEPARATOR + strings.Join(uris, SEPARATOR)
+	canonicalUri := separator + strings.Join(uris, separator)
 	// check the uri suffix
-	if strings.HasSuffix(canonicalUri, SEPARATOR) {
+	if strings.HasSuffix(canonicalUri, separator) {
 		return canonicalUri
 	} else {
-		return canonicalUri + SEPARATOR
+		return canonicalUri + separator
 	}
 }
 
@@ -154,7 +154,7 @@ func getCanonicalHeaders(req *http.Request) string {
 		headers = append(headers, strings.ToLower(key) + ":" + strings.Join(val, ","))
 	}
 	sort.Strings(headers)
-	return strings.Join(headers, LINE_SEPARATOR) + LINE_SEPARATOR
+	return strings.Join(headers, lineSeparator) + lineSeparator
 }
 
 // return signed headers list as string
@@ -217,7 +217,7 @@ func getStringToSign(canonicalRequest string, dateTime string) (string, error) {
 		return "", errHexEncode
 	}
 	// construct complete
-	return strings.Join([]string{ALGORITHM, dateTime, hexEncodeReq}, LINE_SEPARATOR), nil
+	return strings.Join([]string{algorithm, dateTime, hexEncodeReq}, lineSeparator), nil
 }
 
 // calculate the signature with string to sign and secret key.
@@ -253,5 +253,5 @@ func getAuthorizationHeaderValue(signature, accessKey, signedHeaders string) str
 	// signature
 	sign := "Signature=" + signature
 	// construct complete
-	return strings.Join([]string{ALGORITHM, access, headers, sign}, " ")
+	return strings.Join([]string{algorithm, access, headers, sign}, " ")
 }

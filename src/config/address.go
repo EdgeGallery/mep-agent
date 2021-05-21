@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-// server address url config
+// Package config server address url config
 package config
 
 import (
@@ -24,52 +24,54 @@ import (
 	"strings"
 )
 
-type ServerUrl struct {
-	MepServerRegisterUrl   string
-	MepAuthUrl             string
-	MepHeartBeatUrl        string
-	MepServiceDiscoveryUrl string
+// ServerURL : List of Urls.
+type ServerURL struct {
+	MepServerRegisterURL   string
+	MepAuthURL             string
+	MepHeartBeatURL        string
+	MepServiceDiscoveryURL string
 }
 
 const (
-	MepAuthApigwUrl           string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/token"
-	MepSerRegisterApigwUrl    string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/mec_service_mgmt/v1/applications/${appInstanceId}/services"
-	MepSerQueryByNameApigwUrl string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/mec_service_mgmt/v1/services?ser_name="
-	MepHeartBeatApigwUrl      string = "https://${MEP_IP}:${MEP_APIGW_PORT}"
-	MepIp                     string = "${MEP_IP}"
-	MepApigwPort              string = "${MEP_APIGW_PORT}"
+	mepAuthApigwURL           string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/token"
+	mepSerRegisterApigwURL    string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/mec_service_mgmt/v1/applications/${appInstanceId}/services"
+	mepSerQueryByNameApigwURL string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/mec_service_mgmt/v1/services?ser_name="
+	mepHeartBeatApigwURL      string = "https://${MEP_IP}:${MEP_APIGW_PORT}"
+	mepIP                     string = "${MEP_IP}"
+	mepApigwPort              string = "${MEP_APIGW_PORT}"
 )
 
-var ServerUrlConfig ServerUrl
+// ServerURLConfig server Url Configuration.
+var ServerURLConfig ServerURL
 
-// Returns server URL
-func GetServerUrl() (ServerUrl, error) {
-
-	var serverUrl ServerUrl
+// GetServerURL returns server URL.
+func GetServerURL() (ServerURL, error) {
+	var serverURL ServerURL
 	// validate the env params
-	mepIp := os.Getenv("MEP_IP")
-	if util.ValidateDns(mepIp) != nil {
-		return serverUrl, errors.New("validate MEP_IP failed")
+	mepIPVal := os.Getenv("MEP_IP")
+	if util.ValidateDNS(mepIP) != nil {
+		return serverURL, errors.New("validate MEP_IP failed")
 	}
-	mepApiGwPort := os.Getenv("MEP_APIGW_PORT")
-	if util.ValidateByPattern(util.PORT_PATTERN, mepApiGwPort) != nil {
-		return serverUrl, errors.New("validate MEP_APIGW_PORT failed")
+	mepAPIGwPort := os.Getenv("MEP_APIGW_PORT")
+	if util.ValidateByPattern(util.PortPattern, mepAPIGwPort) != nil {
+		return serverURL, errors.New("validate MEP_APIGW_PORT failed")
 	}
 
-	serverUrl.MepServerRegisterUrl = strings.Replace(
-		strings.Replace(MepSerRegisterApigwUrl, MepIp, mepIp, 1),
-		MepApigwPort, mepApiGwPort, 1)
+	serverURL.MepServerRegisterURL = strings.Replace(
+		strings.Replace(mepSerRegisterApigwURL, mepIP, mepIPVal, 1),
+		mepApigwPort, mepAPIGwPort, 1)
 
-	serverUrl.MepAuthUrl = strings.Replace(
-		strings.Replace(MepAuthApigwUrl, MepIp, mepIp, 1),
-		MepApigwPort, mepApiGwPort, 1)
+	serverURL.MepAuthURL = strings.Replace(
+		strings.Replace(mepAuthApigwURL, mepIP, mepIPVal, 1),
+		mepApigwPort, mepAPIGwPort, 1)
 
-	serverUrl.MepHeartBeatUrl = strings.Replace(
-		strings.Replace(MepHeartBeatApigwUrl, MepIp, mepIp, 1),
-		MepApigwPort, mepApiGwPort, 1)
+	serverURL.MepHeartBeatURL = strings.Replace(
+		strings.Replace(mepHeartBeatApigwURL, mepIP, mepIPVal, 1),
+		mepApigwPort, mepAPIGwPort, 1)
 
-	serverUrl.MepServiceDiscoveryUrl = strings.Replace(
-		strings.Replace(MepSerQueryByNameApigwUrl, MepIp, mepIp, 1),
-		MepApigwPort, mepApiGwPort, 1)
-	return serverUrl, nil
+	serverURL.MepServiceDiscoveryURL = strings.Replace(
+		strings.Replace(mepSerQueryByNameApigwURL, mepIP, mepIPVal, 1),
+		mepApigwPort, mepAPIGwPort, 1)
+
+	return serverURL, nil
 }

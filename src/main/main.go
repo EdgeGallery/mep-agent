@@ -14,17 +14,19 @@
  *  limitations under the License.
  */
 
+// main package
 package main
 
 import (
-	"github.com/astaxie/beego"
-	log "github.com/sirupsen/logrus"
 	"mep-agent/src/config"
-	"mep-agent/src/controllers"
+	controller "mep-agent/src/controllers"
 	_ "mep-agent/src/router"
 	"mep-agent/src/service"
 	"mep-agent/src/util"
 	"os"
+
+	"github.com/astaxie/beego"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -36,14 +38,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	service.TlsConf, err = service.TlsConfig()
+	service.TLSConf, err = service.TLSConfig()
 	if err != nil {
 		log.Error("Failed to set TLS Configurations")
 		util.ClearMap()
 		os.Exit(1)
 	}
 
-	config.ServerUrlConfig, err = config.GetServerUrl()
+	config.ServerURLConfig, err = config.GetServerURL()
 	if err != nil {
 		log.Error("Failed to get server url Configurations")
 		util.ClearMap()
@@ -54,6 +56,6 @@ func main() {
 	go service.BeginService().Start("./conf/app_instance_info.yaml")
 
 	log.Info("Starting server")
-	beego.ErrorController(&controllers.ErrorController{})
+	beego.ErrorController(&controller.ErrorController{})
 	beego.Run()
 }
