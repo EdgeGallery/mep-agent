@@ -98,8 +98,8 @@ func GetAppInstanceID() (string, error) {
 	defer os.Unsetenv(appInstID)
 	instID := os.Getenv(appInstID)
 	if len(instID) == 0 {
-		err := errors.New("appInstanceId should be set in env variable")
-		log.Error("appInstanceId must be set")
+		err := errors.New("app instance id should be set in env variable")
+		log.Error("App instance id must be set")
 
 		return "", err
 	}

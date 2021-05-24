@@ -62,7 +62,7 @@ type endPointInfoAddress struct {
 
 // Get handles endpoint request from app.
 func (c *EndpointController) Get() {
-	log.Info("received get endpoint request from app")
+	log.Info("Received get endpoint request from app")
 
 	serName := c.Ctx.Input.Param(":serName")
 	url := config.ServerURLConfig.MepServiceDiscoveryURL + serName
@@ -73,7 +73,7 @@ func (c *EndpointController) Get() {
 	}
 	var resBodyMap []Service
 
-	log.Info("resBodyMap: ", resBody)
+	log.Info("Response Body: ", resBody)
 
 	err := json.Unmarshal([]byte(resBody), &resBodyMap)
 	if err != nil {

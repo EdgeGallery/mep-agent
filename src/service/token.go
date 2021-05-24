@@ -43,7 +43,7 @@ func GetMepToken(auth model.Auth) error { // construct http request and send
 		return errJSON
 	}
 
-	log.Info("get token success.")
+	log.Info("Get token success.")
 
 	// start timer to refresh token
 	go startRefreshTimer()
@@ -61,9 +61,9 @@ func startRefreshTimer() {
 	if util.RefreshTimer != nil {
 		ok := util.RefreshTimer.Stop()
 		if ok {
-			log.Info("timer stopped")
+			log.Info("Timer stopped")
 		} else {
-			log.Info("timer not yet started")
+			log.Info("Timer not yet started")
 		}
 	}
 	// start timer with latest token expiry value - buffertime

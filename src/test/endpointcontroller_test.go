@@ -63,7 +63,7 @@ func getEndpointController() *controllers.EndpointController {
 	c.Init(context.NewContext(), "", "", nil)
 	req, err := http.NewRequest("POST", "http://127.0.0.1", strings.NewReader(""))
 	if err != nil {
-		log.Error("prepare http request failed")
+		log.Error("Prepare http request failed")
 	}
 	c.Ctx.Request = req
 	c.Ctx.Request.Header.Set("X-Real-Ip", "127.0.0.1")

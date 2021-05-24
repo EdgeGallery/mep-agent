@@ -72,7 +72,7 @@ func TestStartFail(t *testing.T) {
 		})
 		patch3 := gomonkey.ApplyFunc(service.RegisterToMep, func(model.AppInstanceInfo,
 			*sync.WaitGroup)([]model.ServiceInfoPost, error) {
-			return dataStore, errors.New("Some error")
+			return dataStore, errors.New("some error")
 		})
 
 		AK := []byte("accessKey")

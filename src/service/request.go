@@ -111,7 +111,7 @@ func postRegisterRequest(registerData registerData) (string, error) {
 
 // get token from mep.
 func postTokenRequest(param string, url string, auth model.Auth) (string, error) {
-	log.Infof("PostTokenRequest param: %s, url: %s, ak: %s", param, url, auth.AccessKey)
+	log.Infof("Post Token Request param: %s, url: %s, ak: %s", param, url, auth.AccessKey)
 	// construct http request
 	req, errNewRequest := http.NewRequest("POST", url, strings.NewReader(param))
 	if errNewRequest != nil {
@@ -146,10 +146,10 @@ func postTokenRequest(param string, url string, auth model.Auth) (string, error)
 	}
 
 	if response.StatusCode != http.StatusOK {
-		log.Errorf("response status: %s, body: %s", response.Status, string(body))
+		log.Errorf("Response status: %s, body: %s", response.Status, string(body))
 		return "", errors.New("request failed, status is " + strconv.Itoa(response.StatusCode))
 	}
-	log.Infof("response status: %s", response.Status)
+	log.Infof("Response status: %s", response.Status)
 
 	return string(body), nil
 }
@@ -167,20 +167,20 @@ func doRequest(req *http.Request) (*http.Response, error) {
 func TLSConfig() (*tls.Config, error) {
 	appConf, errGetConf := getAPPConf("./conf/app_conf.yaml")
 	if errGetConf != nil {
-		log.Error("parse app_conf.yaml failed")
+		log.Error("Parse app_conf.yaml failed")
 		return nil, errors.New("parse app_conf.yaml failed")
 	}
 	sslCiphers := appConf.SslCiphers
 	if len(sslCiphers) == 0 {
-		return nil, errors.New("TLS cipher configuration is not recommended or invalid")
+		return nil, errors.New("tls cipher configuration is not recommended or invalid")
 	}
 	cipherSuites := getCipherSuites(sslCiphers)
 	if cipherSuites == nil {
-		return nil, errors.New("TLS cipher configuration is not recommended or invalid")
+		return nil, errors.New("tls cipher configuration is not recommended or invalid")
 	}
 	domainName := os.Getenv("CA_CERT_DOMAIN_NAME")
 	if util.ValidateDomainName(domainName) != nil {
-		return nil, errors.New("Domain name validation failed")
+		return nil, errors.New("domain name validation failed")
 	}
 
 	return &tls.Config{

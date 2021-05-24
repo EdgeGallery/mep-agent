@@ -31,9 +31,9 @@ type TokenController struct {
 
 // Get /mep-agent/v1/token function.
 func (c *TokenController) Get() {
-	log.Info("received get token request from app")
+	log.Info("Received get token request from app")
 	if !util.FirstToken {
-		log.Error("First Token not yet received.")
+		log.Error("First token not yet received.")
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusPreconditionFailed)
 
 		return
