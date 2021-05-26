@@ -224,7 +224,7 @@ func getStringToSign(canonicalRequest string, dateTime string) (string, error) {
 func calculateSignature(stringToSign string, secretKey *[]byte) (encodeStr string, err error) {
 	defer func() {
 		if err1 := recover(); err1 != nil {
-			log.Error("panic handled:", err1)
+			log.Error("Panic handled:", err1)
 			err = fmt.Errorf("recover panic as %s", err1)
 		}
 	}()

@@ -41,13 +41,13 @@ func (ser *ser) Start(confPath string) {
 	// read app_instance_info.yaml file and transform to AppInstanceInfo object
 	conf, errGetConf := GetAppInstanceConf(confPath)
 	if errGetConf != nil {
-		log.Error("parse app_instance_info.yaml failed.")
+		log.Error("Parse app_instance_info.yaml failed.")
 
 		return
 	}
 	_, errAppInst := util.GetAppInstanceID()
 	if errAppInst != nil {
-		log.Error("get app instance id failed.")
+		log.Error("Get app instance id failed.")
 
 		return
 	}
@@ -55,7 +55,7 @@ func (ser *ser) Start(confPath string) {
 	var auth = model.Auth{SecretKey: util.AppConfig["SECRET_KEY"], AccessKey: string(*util.AppConfig["ACCESS_KEY"])}
 	errGetMepToken := GetMepToken(auth)
 	if errGetMepToken != nil {
-		log.Error("get token failed.")
+		log.Error("Get token failed.")
 		return
 	}
 	util.FirstToken = true
@@ -65,7 +65,7 @@ func (ser *ser) Start(confPath string) {
 	if conf.ServiceInfoPosts != nil {
 		responseBody, errRegisterToMep := RegisterToMep(conf, wg)
 		if errRegisterToMep != nil {
-			log.Error("failed to register to mep: " + errRegisterToMep.Error())
+			log.Error("Failed to register to mep: " + errRegisterToMep.Error())
 			return
 		}
 
@@ -74,7 +74,7 @@ func (ser *ser) Start(confPath string) {
 				wg.Add(1)
 				heartBeatTicker(serviceInfo)
 			} else {
-				log.Info("liveness is not configured or required")
+				log.Info("Liveness is not configured or required")
 			}
 		}
 	}

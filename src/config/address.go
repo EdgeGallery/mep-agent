@@ -50,11 +50,11 @@ func GetServerURL() (ServerURL, error) {
 	// validate the env params
 	mepIPVal := os.Getenv("MEP_IP")
 	if util.ValidateDNS(mepIP) != nil {
-		return serverURL, errors.New("validate MEP_IP failed")
+		return serverURL, errors.New("validate mep ip failed")
 	}
 	mepAPIGwPort := os.Getenv("MEP_APIGW_PORT")
 	if util.ValidateByPattern(util.PortPattern, mepAPIGwPort) != nil {
-		return serverURL, errors.New("validate MEP_APIGW_PORT failed")
+		return serverURL, errors.New("validate mep api gw failed")
 	}
 
 	serverURL.MepServerRegisterURL = strings.Replace(

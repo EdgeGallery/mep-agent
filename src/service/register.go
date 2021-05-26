@@ -47,12 +47,12 @@ var dataStore []model.ServiceInfoPost
 
 // RegisterToMep Registers service to mep.
 func RegisterToMep(conf model.AppInstanceInfo, wg *sync.WaitGroup) ([]model.ServiceInfoPost, error) {
-	log.Info("begin to register service to mep")
+	log.Info("Begin to register service to mep.")
 	serviceInfos := conf.ServiceInfoPosts
 	appInstanceID := util.AppInstanceID
 
 	if len(serviceInfos) > maxServiceCount {
-		log.Error("Failed to register all the services to mep, appInstanceId is " + appInstanceID)
+		log.Error("Failed to register all the services to mep, app instance id is " + appInstanceID)
 		return nil, errors.New("registration of service failed, cannot contain more than " +
 			strconv.Itoa(maxServiceCount) + " services in a single request")
 	}
@@ -73,12 +73,12 @@ func RegisterToMep(conf model.AppInstanceInfo, wg *sync.WaitGroup) ([]model.Serv
 		var registerInfo = registerData{data: string(data), url: url, token: &util.MepToken}
 		resBody, errPostRequest := postRegisterRequest(registerInfo)
 		if errPostRequest != nil {
-			log.Error("failed to register to mep, appInstanceId is " + appInstanceID +
+			log.Error("Failed to register to mep, app instance id is " + appInstanceID +
 				", serviceName is " + serviceInfo.SerName)
 			wg.Add(1)
 			go retryRegister(registerInfo, appInstanceID, serviceInfo, wg)
 		} else {
-			log.Info("register to mep success, appInstanceId is " + appInstanceID +
+			log.Info("Register to mep success, app instance id is " + appInstanceID +
 				", serviceName is " + serviceInfo.SerName)
 			errPostRequest = storeRegisterData(resBody)
 			if errPostRequest != nil {
@@ -86,7 +86,7 @@ func RegisterToMep(conf model.AppInstanceInfo, wg *sync.WaitGroup) ([]model.Serv
 			}
 		}
 	}
-	log.Info("services registered to mep count ", len(dataStore))
+	log.Info("Services registered to mep count ", len(dataStore))
 
 	return dataStore, nil
 }
@@ -103,10 +103,10 @@ func retryRegister(registerData registerData, appInstanceID string, serviceInfo 
 
 		resBody, errPostRequest := postRegisterRequest(registerData)
 		if errPostRequest != nil {
-			log.Error("Failed to register to mep, appInstanceId is " + appInstanceID +
+			log.Error("Failed to register to mep, app instance id is " + appInstanceID +
 				", serviceName is " + serviceInfo.SerName)
 		} else {
-			log.Info("Register to mep success, appInstanceId is " + appInstanceID +
+			log.Info("Register to mep success, app instance id is " + appInstanceID +
 				", serviceName is " + serviceInfo.SerName)
 			errJSONUnMarshal := storeRegisterData(resBody)
 			if errJSONUnMarshal != nil {

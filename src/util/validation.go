@@ -75,10 +75,10 @@ func ValidateUUID(id string) error {
 		validate := validator.New()
 		res := validate.Var(id, "required,uuid")
 		if res != nil {
-			return errors.New("UUID validate failed")
+			return errors.New("uuid validate failed")
 		}
 	} else {
-		return errors.New("UUID validate failed")
+		return errors.New("uuid validate failed")
 	}
 
 	return nil

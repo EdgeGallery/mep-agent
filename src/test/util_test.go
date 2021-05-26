@@ -58,6 +58,6 @@ func TestGetAppInstanceIdDecodeFailed(t *testing.T) {
 
 func TestGetAppInstanceIdNotSet(t *testing.T) {
 	_, err := util.GetAppInstanceID()
-	Expected := "appInstanceId should be set in env variable"
+	Expected := "app instance id should be set in env variable"
 	assert.EqualError(t, err, Expected)
 }
