@@ -38,7 +38,7 @@ func TestEndpointControllerGet(t *testing.T) {
 	})
 	defer patch1.Reset()
 
-	patch2 := gomonkey.ApplyFunc(service.SendQueryRequest, func(service.RequestData) (string, error) {
+	patch2 := gomonkey.ApplyFunc(service.SendQueryRequest, func(service.RequestData, string) (string, error) {
 		service := controllers.Service{
 			TransportInfo: controllers.TransportInfo{
 				Id:   "123",

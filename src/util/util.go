@@ -52,6 +52,10 @@ const (
 	appInstID string = "APPINSTID"
 )
 
+const (
+	XAppInstanceId string = "X-AppInstanceId"
+)
+
 // ClearByteArray Clears byte array.
 func ClearByteArray(data []byte) {
 	if data == nil {
