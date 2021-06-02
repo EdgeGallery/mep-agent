@@ -67,7 +67,8 @@ func (c *EndpointController) Get() {
 	serName := c.Ctx.Input.Param(":serName")
 	url := config.ServerURLConfig.MepServiceDiscoveryURL + serName
 	requestData := service.RequestData{Data: "", URL: url, Token: &util.MepToken}
-	resBody, errPostRequest := service.SendQueryRequest(requestData)
+	appInstanceId := c.Ctx.Input.Header(util.XAppInstanceId)
+	resBody, errPostRequest := service.SendQueryRequest(requestData, appInstanceId)
 	if errPostRequest != nil {
 		log.Error("Failed heart beat request to mep, URL is " + url)
 	}
