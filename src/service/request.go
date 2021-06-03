@@ -240,13 +240,13 @@ func sendHeartBeatRequest(heartBeatData heartBeatData) (string, error) {
 }
 
 // SendQueryRequest Query endpoint from MEP.
-func SendQueryRequest(requestData RequestData, appInstanceId string) (string, error) {
+func SendQueryRequest(requestData RequestData) (string, error) {
 	req, errNewRequest := http.NewRequest("GET", requestData.URL, strings.NewReader(requestData.Data))
 	if errNewRequest != nil {
 		return "", errNewRequest
 	}
 	req.Header.Set(authorization, requestData.Token.TokenType+" "+requestData.Token.AccessToken)
-	req.Header.Set(util.XAppInstanceId, appInstanceId)
+	req.Header.Set(util.XAppInstanceId, util.AppInstanceID)
 
 	response, errDo := doRequest(req)
 	if errDo != nil {
