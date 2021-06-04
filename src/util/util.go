@@ -47,8 +47,8 @@ var RefreshTimer *time.Timer
 const RefreshTimeBuffer = 5
 
 const (
-	ak        string = "ak"
-	sk        string = "sk"
+	ak        string = "AK"
+	sk        string = "SK"
 	appInstID string = "APPINSTID"
 )
 

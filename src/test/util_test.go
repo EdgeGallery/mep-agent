@@ -34,21 +34,20 @@ func TestClearByteArray(t *testing.T) {
 }
 
 func TestReadTokenFromEnvironment1(t *testing.T) {
-	os.Setenv("ak", "ZXhhbXBsZUFL")
-	os.Setenv("sk", "ZXhhbXBsZVNL")
+	os.Setenv("AK", "ZXhhbXBsZUFL")
+	os.Setenv("SK", "ZXhhbXBsZVNL")
 	err := util.ReadTokenFromEnvironment()
-	assert.EqualValues(t, 0, len(os.Getenv("ak")))
-	assert.EqualValues(t, 0, len(os.Getenv("sk")))
+	assert.EqualValues(t, 0, len(os.Getenv("AK")))
+	assert.EqualValues(t, 0, len(os.Getenv("SK")))
 	assert.NoError(t, err, "No error is expected")
 }
 
 func TestReadTokenFromEnvironment2(t *testing.T) {
-	os.Setenv("ak", "ZXhhbXBsZUFL")
+	os.Setenv("AK", "ZXhhbXBsZUFL")
 	err := util.ReadTokenFromEnvironment()
 	Expected := "ak and sk keys should be set in env variable"
 	assert.EqualError(t, err, Expected)
 }
-
 
 func TestGetAppInstanceIdDecodeFailed(t *testing.T) {
 	os.Setenv("APPINSTID", "b1fe5b4d-76a7-4a52-b60f-932fde7c8d57")
