@@ -35,10 +35,10 @@ func TestClearByteArray(t *testing.T) {
 
 func TestReadTokenFromEnvironment1(t *testing.T) {
 	os.Setenv("AK", "ZXhhbXBsZUFL")
-	os.Setenv("AK", "ZXhhbXBsZVNL")
+	os.Setenv("SK", "ZXhhbXBsZVNL")
 	err := util.ReadTokenFromEnvironment()
 	assert.EqualValues(t, 0, len(os.Getenv("AK")))
-	assert.EqualValues(t, 0, len(os.Getenv("AK")))
+	assert.EqualValues(t, 0, len(os.Getenv("SK")))
 	assert.NoError(t, err, "No error is expected")
 }
 
