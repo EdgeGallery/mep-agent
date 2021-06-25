@@ -18,12 +18,11 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/astaxie/beego"
+	log "github.com/sirupsen/logrus"
 	"mep-agent/src/config"
 	"mep-agent/src/service"
 	"mep-agent/src/util"
-
-	"github.com/astaxie/beego"
-	log "github.com/sirupsen/logrus"
 )
 
 type EndpointController struct {
@@ -31,6 +30,7 @@ type EndpointController struct {
 }
 
 type Service struct {
+	SerName       string        `json:"serName"`
 	TransportInfo TransportInfo `yaml:"transportInfo" json:"transportInfo"`
 }
 
@@ -63,7 +63,7 @@ func (c *EndpointController) Get() {
 		log.Error("Failed to get serviceUrl")
 	}
 
-	url := server.MepServiceDiscoveryUrl + serName
+	url := server.MepServiceDiscoveryUrl
 	log.Info("get endpoint url: " + url)
 	requestData := service.RequestData{Data: "", Url: url, Token: &util.MepToken}
 	resBody, errPostRequest := service.SendQueryRequest(requestData)
@@ -72,17 +72,23 @@ func (c *EndpointController) Get() {
 	}
 
 	var resBodyMap []Service
-	log.Info("resBodyMap: " + resBody)
+	log.Infof("resBody: %s", resBody)
 	err := json.Unmarshal([]byte(resBody), &resBodyMap)
+
 	if err != nil {
 		log.Error("Unmarshal failed")
 		c.Data["json"] = "Service does not exist."
 		c.Ctx.ResponseWriter.WriteHeader(400)
 	} else {
-		transportInfo := resBodyMap[0].TransportInfo
-		log.Info("Endpoint: ", transportInfo.Endpoint)
-		c.Data["json"] = transportInfo.Endpoint
-		c.Ctx.ResponseWriter.WriteHeader(200)
+		for _, service := range resBodyMap {
+			if serName == service.SerName {
+				transportInfo := service.TransportInfo
+				log.Info("Endpoint: ", transportInfo.Endpoint)
+				c.Data["json"] = transportInfo.Endpoint
+				c.Ctx.ResponseWriter.WriteHeader(200)
+				break
+			}
+		}
 	}
 	c.ServeJSON()
 }
