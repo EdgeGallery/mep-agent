@@ -64,7 +64,7 @@ func (c *EndpointController) Get() {
 	}
 
 	url := server.MepServiceDiscoveryUrl + serName
-
+	log.Info("get endpoint url: " + url)
 	requestData := service.RequestData{Data: "", Url: url, Token: &util.MepToken}
 	resBody, errPostRequest := service.SendQueryRequest(requestData)
 	if errPostRequest != nil {
@@ -72,7 +72,7 @@ func (c *EndpointController) Get() {
 	}
 
 	var resBodyMap []Service
-	log.Info("resBodyMap: ", resBody)
+	log.Info("resBodyMap: " + resBody)
 	err := json.Unmarshal([]byte(resBody), &resBodyMap)
 	if err != nil {
 		log.Error("Unmarshal failed")
