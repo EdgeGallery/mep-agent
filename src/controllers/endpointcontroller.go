@@ -76,8 +76,8 @@ func (c *EndpointController) Get() {
 	log.Info("Response Body: ", resBody)
 
 	err := json.Unmarshal([]byte(resBody), &resBodyMap)
-	if err != nil {
-		log.Error("Unmarshal failed")
+	if err != nil || len(resBodyMap) == 0 {
+		log.Error("Unmarshal failed or resBodyMap null")
 		c.Data["json"] = "Service does not exist."
 		c.Ctx.ResponseWriter.WriteHeader(http.StatusBadRequest)
 	} else {
