@@ -19,6 +19,8 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	log "github.com/sirupsen/logrus"
 	"mep-agent/src/util"
 	"os"
 	"strings"
@@ -33,12 +35,10 @@ type ServerURL struct {
 }
 
 const (
-	mepAuthApigwURL           string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/token"
-	mepSerRegisterApigwURL    string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/mec_service_mgmt/v1/applications/${appInstanceId}/services"
-	mepSerQueryByNameApigwURL string = "https://${MEP_IP}:${MEP_APIGW_PORT}/mep/mec_service_mgmt/v1/services?ser_name="
-	mepHeartBeatApigwURL      string = "https://${MEP_IP}:${MEP_APIGW_PORT}"
-	mepIP                     string = "${MEP_IP}"
-	mepApigwPort              string = "${MEP_APIGW_PORT}"
+	mepAuthApigwURL           string = "%s://%s:%s/mep/token"
+	mepSerRegisterApigwURL    string = "%s://%s:%s/mep/mec_service_mgmt/v1/applications/${appInstanceId}/services"
+	mepSerQueryByNameApigwURL string = "%s://%s:%s/mep/mec_service_mgmt/v1/services?ser_name="
+	mepHeartBeatApigwURL      string = "%s://%s:%s"
 )
 
 // ServerURLConfig server Url Configuration.
@@ -57,21 +57,19 @@ func GetServerURL() (ServerURL, error) {
 		return serverURL, errors.New("validate mep api gw failed")
 	}
 
-	serverURL.MepServerRegisterURL = strings.Replace(
-		strings.Replace(mepSerRegisterApigwURL, mepIP, mepIPVal, 1),
-		mepApigwPort, mepAPIGwPort, 1)
+	egProtocol := "https"
+	if strings.EqualFold(os.Getenv("EG_PROTOCOL"), "http") {
+		egProtocol = "http"
+	}
+	log.Info("egProtocol: " + egProtocol)
 
-	serverURL.MepAuthURL = strings.Replace(
-		strings.Replace(mepAuthApigwURL, mepIP, mepIPVal, 1),
-		mepApigwPort, mepAPIGwPort, 1)
+	serverURL.MepServerRegisterURL = fmt.Sprintf(mepSerRegisterApigwURL, egProtocol, mepIPVal, mepAPIGwPort)
 
-	serverURL.MepHeartBeatURL = strings.Replace(
-		strings.Replace(mepHeartBeatApigwURL, mepIP, mepIPVal, 1),
-		mepApigwPort, mepAPIGwPort, 1)
+	serverURL.MepServerRegisterURL = fmt.Sprintf(mepAuthApigwURL, egProtocol, mepIPVal, mepAPIGwPort)
 
-	serverURL.MepServiceDiscoveryURL = strings.Replace(
-		strings.Replace(mepSerQueryByNameApigwURL, mepIP, mepIPVal, 1),
-		mepApigwPort, mepAPIGwPort, 1)
+	serverURL.MepHeartBeatURL = fmt.Sprintf(mepHeartBeatApigwURL, egProtocol, mepIPVal, mepAPIGwPort)
+
+	serverURL.MepServiceDiscoveryURL = fmt.Sprintf(mepSerQueryByNameApigwURL, egProtocol, mepIPVal, mepAPIGwPort)
 
 	return serverURL, nil
 }
