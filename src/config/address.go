@@ -20,6 +20,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"mep-agent/src/util"
 	"os"
 	"strings"
@@ -60,6 +61,7 @@ func GetServerURL() (ServerURL, error) {
 	if strings.EqualFold(os.Getenv("EG_PROTOCOL"), "http") {
 		egProtocol = "http"
 	}
+	log.Info("egProtocol: " + egProtocol)
 
 	serverURL.MepServerRegisterURL = fmt.Sprintf(mepSerRegisterApigwURL, egProtocol, mepIPVal, mepAPIGwPort)
 
