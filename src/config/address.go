@@ -65,7 +65,7 @@ func GetServerURL() (ServerURL, error) {
 
 	serverURL.MepServerRegisterURL = fmt.Sprintf(mepSerRegisterApigwURL, egProtocol, mepIPVal, mepAPIGwPort)
 
-	serverURL.MepServerRegisterURL = fmt.Sprintf(mepAuthApigwURL, egProtocol, mepIPVal, mepAPIGwPort)
+	serverURL.MepAuthURL = fmt.Sprintf(mepAuthApigwURL, egProtocol, mepIPVal, mepAPIGwPort)
 
 	serverURL.MepHeartBeatURL = fmt.Sprintf(mepHeartBeatApigwURL, egProtocol, mepIPVal, mepAPIGwPort)
 
