@@ -60,6 +60,7 @@ func GetServerURL() (ServerURL, error) {
 	egProtocol := "https"
 	if strings.EqualFold(os.Getenv("EG_PROTOCOL"), "http") {
 		egProtocol = "http"
+		mepAPIGwPort = "8000"
 	}
 	log.Info("egProtocol: " + egProtocol)
 
